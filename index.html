@@ -62,10 +62,52 @@
       </div>
     </div>
   </body>
-
   <script>
-    "use strict";
-    // Код писать здесь
-    console.log("It works!");
-  </script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.querySelector('.add-form-name');
+    const commentInput = document.querySelector('.add-form-text');
+    const addButton = document.querySelector('.add-form-button');
+    const commentsList = document.querySelector('.comments');
+    
+    nameInput.addEventListener('input', checkInputs);
+    commentInput.addEventListener('input', checkInputs);
+    
+    function checkInputs() {
+      addButton.disabled = !(nameInput.value.trim() && commentInput.value.trim());
+    }
+    
+    addButton.addEventListener('click', function() {
+      if (!nameInput.value.trim() || !commentInput.value.trim()) return;
+      
+      const date = new Date();
+      const formattedDate = date.toLocaleString();
+      
+      const newComment = `
+        <div class="comment">
+          <div class="comment-header">
+            <div>${nameInput.value}</div>
+            <div>${formattedDate}</div>
+          </div>
+          <div class="comment-body">
+            ${commentInput.value}
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">0</span>
+              <button class="like-button"></button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      commentsList.innerHTML += newComment;
+      
+      nameInput.value = '';
+      commentInput.value = '';
+      addButton.disabled = true;
+    });
+  });
+</script>
+
+
 </html>
