@@ -69,6 +69,54 @@
     const addButton = document.querySelector('.add-form-button');
     const commentsList = document.querySelector('.comments');
     
+    let comments = [
+      {
+        id: 1,
+        name: 'Глеб Фокин',
+        text: 'Это будет первый комментарий',
+        date: '12.02.2023 12:00',
+        likes: 0,
+        isLiked: false
+      }
+    ];
+
+    function renderComments() {
+      commentsList.innerHTML = comments.map(comment => `
+        <div class="comment" data-id="${comment.id}">
+          <div class="comment-header">
+            <div>${comment.name}</div>
+            <div>${comment.date}</div>
+          </div>
+          <div class="comment-body">
+            ${comment.text}
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">${comment.likes}</span>
+              <button class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      document.querySelectorAll('.like-button').forEach(button => {
+        button.addEventListener('click', (event) => {
+          const commentElement = event.target.closest('.comment');
+          const commentId = parseInt(commentElement.dataset.id);
+          toggleLike(commentId);
+        });
+      });
+    }
+
+    function toggleLike(commentId) {
+      const comment = comments.find(c => c.id === commentId);
+      if (comment) {
+        comment.isLiked = !comment.isLiked;
+        comment.likes += comment.isLiked ? 1 : -1;
+        renderComments();
+      }
+    }
+
     nameInput.addEventListener('input', checkInputs);
     commentInput.addEventListener('input', checkInputs);
     
@@ -79,35 +127,24 @@
     addButton.addEventListener('click', function() {
       if (!nameInput.value.trim() || !commentInput.value.trim()) return;
       
-      const date = new Date();
-      const formattedDate = date.toLocaleString();
+      const newComment = {
+        id: Date.now(), 
+        name: nameInput.value.trim(),
+        text: commentInput.value.trim(),
+        date: new Date().toLocaleString(),
+        likes: 0,
+        isLiked: false
+      };
       
-      const newComment = `
-        <div class="comment">
-          <div class="comment-header">
-            <div>${nameInput.value}</div>
-            <div>${formattedDate}</div>
-          </div>
-          <div class="comment-body">
-            ${commentInput.value}
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">0</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </div>
-      `;
-      
-      commentsList.innerHTML += newComment;
+      comments.push(newComment);
+      renderComments();
       
       nameInput.value = '';
       commentInput.value = '';
       addButton.disabled = true;
     });
+
+    renderComments();
   });
 </script>
-
-
 </html>
