@@ -5,14 +5,14 @@ function renderComments() {
   const commentsList = document.querySelector('.comments');
   commentsList.innerHTML = '';
 
-  comments.forEach(comment => {
+  comments.forEach((comment) => {
     const safeName = escapeHTML(comment.name);
     const safeText = escapeHTML(comment.text);
-    
+
     const commentElement = document.createElement('li');
     commentElement.className = 'comment';
     commentElement.dataset.id = comment.id;
-    
+
     let html = `
       <div class="comment-header">
         <div>${safeName}</div>

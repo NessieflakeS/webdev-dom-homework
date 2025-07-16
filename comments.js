@@ -6,8 +6,8 @@ let comments = [
     date: '05.04.1994 12:00',
     likes: 0,
     isLiked: false,
-    replyTo: null
-  }
+    replyTo: null,
+  },
 ];
 
 export { comments };
