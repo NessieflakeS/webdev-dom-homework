@@ -1,24 +1,25 @@
 import { renderComments } from './renderComments.js';
 import { initHandlers } from './eventHandlers.js';
+import { getComments, postComment } from './api.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-  renderComments();
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const comments = await getComments();
+    renderComments(comments);
+  } catch (error) {
+    console.error('Initialization error:', error);
+    const container = document.getElementById('comments');
+    container.innerHTML = `<div class="error">Ошибка загрузки: ${error.message}</div>`;
+  }
 
-  initHandlers();
+  initHandlers({
+    async onAddComment(newComment) {
+      try {
+        const savedComment = await postComment(newComment);
+        renderComments([savedComment, ...comments], true);
+      } catch (error) {
+        alert(`Ошибка отправки: ${error.message}`);
+      }
+    }
+  });
 });
-
-try {
-  const comments = await getComments();
-  renderComments(comments);
-} catch (error) {
-  showError("Не удалось загрузить комментарии");
-}
-
-function showError(message) {
-  const errorEl = document.createElement('div');
-  errorEl.className = 'error';
-  errorEl.textContent = message;
-  document.body.prepend(errorEl);
-  
-  setTimeout(() => errorEl.remove(), 3000);
-}
