@@ -23,3 +23,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
+console.log("Using API module:", { getComments, postComment });
