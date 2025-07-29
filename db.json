@@ -35,6 +35,15 @@
       "likes": 0,
       "isLiked": false,
       "replyTo": null
+    },
+    {
+      "id": "7882",
+      "name": "Данил",
+      "text": "&gt; Это первый комментарий!\nку ку",
+      "date": "29.07.2025, 22:01:11",
+      "likes": 0,
+      "isLiked": false,
+      "replyTo": null
     }
   ]
 }

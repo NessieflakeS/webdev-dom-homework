@@ -12,14 +12,16 @@ function renderComments(comments) {
     commentElement.className = 'comment';
     commentElement.dataset.id = comment.id;
 
-    let html = `
+        let html = `
       <div class="comment-header">
         <div>${safeName}</div>
         <div>${comment.date}</div>
       </div>
       <div class="comment-body">${safeText}</div>
       <div class="comment-footer">
-        <button class="comment-reply" data-id="${comment.id}">Ответить</button>
+        <div>
+          <button class="comment-reply">Ответить</button>
+        </div>
         <div class="likes">
           <span class="likes-counter">${comment.likes || 0}</span>
           <button class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>

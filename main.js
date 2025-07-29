@@ -49,15 +49,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     },
     
-    onReply: (commentId) => {
+     onReply: (commentId) => {
       const comment = comments.find(c => c.id == commentId);
       if (!comment) return;
       
-      const nameInput = document.querySelector('.add-form-name');
       const commentInput = document.querySelector('.add-form-text');
       
-      nameInput.value = comment.name;
-      commentInput.value = `> ${comment.text}\n`;
+      commentInput.value = `> ${comment.text}\n\n`;
       commentInput.focus();
     }
   });
