@@ -153,3 +153,11 @@ body {
 .add-form-button:hover {
   opacity: 0.9;
 }
+
+.reply-text {
+  color: #bcec30;
+  font-size: 14px;
+  margin: 8px 0;
+  padding-left: 10px;
+  border-left: 2px solid #bcec30;
+}

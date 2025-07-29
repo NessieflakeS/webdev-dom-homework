@@ -44,6 +44,24 @@
       "likes": 0,
       "isLiked": false,
       "replyTo": null
+    },
+    {
+      "id": "7b5b",
+      "name": "Данил",
+      "text": "лайки заработали!!!!",
+      "date": "29.07.2025, 22:22:16",
+      "likes": 0,
+      "isLiked": false,
+      "replyTo": null
+    },
+    {
+      "id": "1c0b",
+      "name": "Данил",
+      "text": "теперь не работает ответ ((",
+      "date": "29.07.2025, 22:22:44",
+      "likes": 0,
+      "isLiked": false,
+      "replyTo": null
     }
   ]
 }

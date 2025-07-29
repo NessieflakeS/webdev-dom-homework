@@ -31,32 +31,45 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     },
     
-    onToggleLike: async (commentId) => {
-      try {
-        const comment = comments.find(c => c.id == commentId);
-        if (!comment) return;
+    onReply: (author, text) => {
+    const commentInput = document.querySelector('.add-form-text');
+    commentInput.value = `> ${author}: ${text}\n\n`;
+    commentInput.focus();
+  },
+  
+  onAddComment: async (newComment) => {
+    try {
+      // Проверяем, является ли комментарий ответом
+      let replyTo = null;
+      let commentText = newComment.text;
+      
+      if (commentText.startsWith('> ')) {
+        const lines = commentText.split('\n');
+        const replyMatch = lines[0].match(/^> (.+?): (.+)$/);
         
-        const updatedComment = {
-          ...comment,
-          isLiked: !comment.isLiked,
-          likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
-        };
-        
-        comments = comments.map(c => c.id == commentId ? updatedComment : c);
-        renderComments(comments);
-      } catch (error) {
-        console.error('Ошибка при лайке:', error);
+        if (replyMatch) {
+          replyTo = {
+            author: replyMatch[1],
+            text: replyMatch[2]
+          };
+          commentText = lines.slice(1).join('\n').trim();
+        }
       }
-    },
-    
-     onReply: (commentId) => {
-      const comment = comments.find(c => c.id == commentId);
-      if (!comment) return;
       
-      const commentInput = document.querySelector('.add-form-text');
+      const savedComment = await postComment({
+        ...newComment,
+        text: commentText,
+        date: new Date().toISOString(),
+        likes: 0,
+        isLiked: false,
+        replyTo: replyTo
+      });
       
-      commentInput.value = `> ${comment.text}\n\n`;
-      commentInput.focus();
+      comments = [savedComment, ...comments];
+      renderComments(comments);
+    } catch (error) {
+      alert(`Ошибка отправки: ${error.message}`);
     }
+  }
   });
 });
