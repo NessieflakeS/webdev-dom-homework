@@ -15,7 +15,7 @@ function renderComments(comments) {
     let html = `
       <div class="comment-header">
         <div>${safeName}</div>
-        <div>${comment.date}</div>
+        <div>${new Date(comment.date).toLocaleString()}</div>
       </div>
     `;
 
@@ -23,7 +23,7 @@ function renderComments(comments) {
       const safeReplyAuthor = escapeHTML(comment.replyTo.author);
       const safeReplyText = escapeHTML(comment.replyTo.text);
       html += `
-        <div class="reply-text">→ Ответ ${safeName} на ${safeReplyAuthor}</div>
+        <div class="reply-text">→ Ответ на ${safeReplyAuthor}: ${safeReplyText}</div>
       `;
     }
 

@@ -16,13 +16,7 @@ export const postComment = async (comment) => {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...comment,
-        date: new Date().toLocaleString(),
-        likes: 0,
-        isLiked: false,
-        replyTo: null
-      })
+      body: JSON.stringify(comment)
     });
     
     if (!response.ok) throw new Error("Ошибка отправки");

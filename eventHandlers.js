@@ -6,12 +6,10 @@ export function initHandlers({ onAddComment, onToggleLike, onReply }) {
   const addButton = document.querySelector('.add-form-button');
   const commentsList = document.querySelector('.comments');
 
-  // Проверка заполненности полей
   const checkInputs = () => {
     addButton.disabled = !(nameInput.value.trim() && commentInput.value.trim());
   };
 
-  // Обработчик кликов по комментариям
   commentsList.addEventListener('click', (event) => {
     const target = event.target;
     const commentElement = target.closest('.comment');
@@ -21,21 +19,20 @@ export function initHandlers({ onAddComment, onToggleLike, onReply }) {
     const commentId = commentElement.dataset.id;
 
     if (target.classList.contains('like-button')) {
+      event.preventDefault();
       onToggleLike(commentId);
       return;
     }
 
     if (target.classList.contains('comment-reply')) {
       event.preventDefault();
-      const comment = commentsList.querySelector(`.comment[data-id="${commentId}"] .comment-header div:first-child`);
-      const commentAuthor = comment.textContent;
-      const commentText = commentsList.querySelector(`.comment[data-id="${commentId}"] .comment-body`).textContent;
+      const commentAuthor = commentElement.querySelector('.comment-header div:first-child').textContent;
+      const commentText = commentElement.querySelector('.comment-body').textContent;
       onReply(commentAuthor, commentText);
       return;
     }
   });
 
-  // Обработчик отправки формы
   addButton.addEventListener('click', (event) => {
     event.preventDefault();
     
