@@ -15,7 +15,7 @@ function renderComments(comments) {
     let html = `
       <div class="comment-header">
         <div>${safeName}</div>
-        <div>${new Date(comment.date).toLocaleString()}</div>
+        <div>${comment.date}</div>
       </div>
     `;
 

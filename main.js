@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const savedComment = await postComment({
           ...newComment,
           text: commentText,
-          date: new Date().toISOString(),
+          date: new Date().toLocaleString('ru-RU'),
           likes: 0,
           isLiked: false,
           replyTo: replyTo

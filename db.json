@@ -4,18 +4,18 @@
       "id": "1",
       "name": "Тестовый пользователь",
       "text": "Это первый комментарий!",
-      "date": "2025-05-15T12:00:00Z",
-      "likes": 0,
-      "isLiked": false,
+      "date": "28.07.2025, 11:00:00",
+      "likes": 1,
+      "isLiked": true,
       "replyTo": null
     },
     {
       "id": "2",
       "name": "Второй пользователь",
       "text": "Работает отлично!",
-      "date": "2025-05-16T14:30:00Z",
-      "likes": 0,
-      "isLiked": false,
+      "date": "29.07.2025, 12:00:00",
+      "likes": 1,
+      "isLiked": true,
       "replyTo": null
     },
     {
@@ -23,8 +23,8 @@
       "name": "tretiy",
       "text": "ya tyta",
       "date": "29.07.2025, 21:25:16",
-      "likes": 0,
-      "isLiked": false,
+      "likes": 1,
+      "isLiked": true,
       "replyTo": null
     },
     {
@@ -32,42 +32,6 @@
       "name": "Данил",
       "text": "не работают лайки :((((((((",
       "date": "29.07.2025, 21:30:21",
-      "likes": 0,
-      "isLiked": false,
-      "replyTo": null
-    },
-    {
-      "id": "7882",
-      "name": "Данил",
-      "text": "&gt; Это первый комментарий!\nку ку",
-      "date": "29.07.2025, 22:01:11",
-      "likes": 0,
-      "isLiked": false,
-      "replyTo": null
-    },
-    {
-      "id": "7b5b",
-      "name": "Данил",
-      "text": "лайки заработали!!!!",
-      "date": "29.07.2025, 22:22:16",
-      "likes": 0,
-      "isLiked": false,
-      "replyTo": null
-    },
-    {
-      "id": "1c0b",
-      "name": "Данил",
-      "text": "теперь не работает ответ ((",
-      "date": "29.07.2025, 22:22:44",
-      "likes": 0,
-      "isLiked": false,
-      "replyTo": null
-    },
-    {
-      "id": "90ae",
-      "name": "Данил",
-      "text": "&gt; Данил: теперь не работает ответ ((\n\nВсе работает!!!!",
-      "date": "29.07.2025, 22:40:29",
       "likes": 0,
       "isLiked": false,
       "replyTo": null
