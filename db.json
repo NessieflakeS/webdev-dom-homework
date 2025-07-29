@@ -1,16 +1,40 @@
 {
   "comments": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Тестовый пользователь",
       "text": "Это первый комментарий!",
-      "date": "2023-05-15T12:00:00Z"
+      "date": "2025-05-15T12:00:00Z",
+      "likes": 0,
+      "isLiked": false,
+      "replyTo": null
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Второй пользователь",
       "text": "Работает отлично!",
-      "date": "2023-05-16T14:30:00Z"
+      "date": "2025-05-16T14:30:00Z",
+      "likes": 0,
+      "isLiked": false,
+      "replyTo": null
+    },
+    {
+      "id": "60c1",
+      "name": "tretiy",
+      "text": "ya tyta",
+      "date": "29.07.2025, 21:25:16",
+      "likes": 0,
+      "isLiked": false,
+      "replyTo": null
+    },
+    {
+      "id": "a6d3",
+      "name": "Данил",
+      "text": "не работают лайки :((((((((",
+      "date": "29.07.2025, 21:30:21",
+      "likes": 0,
+      "isLiked": false,
+      "replyTo": null
     }
   ]
 }

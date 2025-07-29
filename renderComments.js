@@ -1,7 +1,6 @@
-import { comments } from './comments.js';
 import { escapeHTML } from './escapeHTML.js';
 
-function renderComments() {
+function renderComments(comments) {
   const commentsList = document.querySelector('.comments');
   commentsList.innerHTML = '';
 
@@ -20,8 +19,9 @@ function renderComments() {
       </div>
       <div class="comment-body">${safeText}</div>
       <div class="comment-footer">
+        <button class="comment-reply" data-id="${comment.id}">Ответить</button>
         <div class="likes">
-          <span class="likes-counter">${comment.likes}</span>
+          <span class="likes-counter">${comment.likes || 0}</span>
           <button class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
         </div>
       </div>

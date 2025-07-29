@@ -1,90 +1,56 @@
-import { comments } from './comments.js';
-import { renderComments } from './renderComments.js';
+import { escapeHTML } from './escapeHTML.js';
 
-let nameInput, commentInput, addButton;
-
-function initHandlers() {
-  nameInput = document.querySelector('.add-form-name');
-  commentInput = document.querySelector('.add-form-text');
-  addButton = document.querySelector('.add-form-button');
+export function initHandlers({ onAddComment, onToggleLike, onReply }) {
+  const nameInput = document.querySelector('.add-form-name');
+  const commentInput = document.querySelector('.add-form-text');
+  const addButton = document.querySelector('.add-form-button');
   const commentsList = document.querySelector('.comments');
 
-  commentsList.addEventListener('click', (e) => {
-    const target = e.target;
-    const commentElement = target.closest('.comment');
+  const checkInputs = () => {
+    addButton.disabled = !(nameInput.value.trim() && commentInput.value.trim());
+  };
 
+  commentsList.addEventListener('click', (event) => {
+    const target = event.target;
+    const commentElement = target.closest('.comment');
+    
     if (!commentElement) return;
 
-    const commentId = parseInt(commentElement.dataset.id);
-    const comment = comments.find((c) => c.id === commentId);
+    const commentId = commentElement.dataset.id;
 
     if (target.classList.contains('like-button')) {
-      toggleLike(commentId);
+      onToggleLike(commentId);
       return;
     }
+  });
 
-    replyToComment(comment);
+  commentsList.addEventListener('click', (event) => {
+    const target = event.target.closest('.comment-reply');
+    if (target) {
+      const commentId = target.dataset.id;
+      onReply(commentId);
+    }
+  });
+
+  addButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    
+    const name = nameInput.value.trim();
+    const text = commentInput.value.trim();
+    
+    if (!name || !text) return;
+    
+    onAddComment({
+      name: escapeHTML(name),
+      text: escapeHTML(text)
+    });
+    
+    nameInput.value = '';
+    commentInput.value = '';
+    addButton.disabled = true;
   });
 
   nameInput.addEventListener('input', checkInputs);
   commentInput.addEventListener('input', checkInputs);
-
-  addButton.addEventListener('click', addComment);
+  checkInputs();
 }
-
-function toggleLike(commentId) {
-  const comment = comments.find((c) => c.id === commentId);
-  if (!comment) return;
-
-  comment.isLiked = !comment.isLiked;
-  comment.likes += comment.isLiked ? 1 : -1;
-  renderComments();
-}
-
-function replyToComment(comment) {
-  nameInput.value = comment.name;
-  commentInput.value = `> ${comment.text}\n`;
-  commentInput.focus();
-}
-
-function checkInputs() {
-  addButton.disabled = !(nameInput.value.trim() && commentInput.value.trim());
-}
-
-function addComment() {
-  const author = nameInput.value.trim();
-  const text = commentInput.value.trim();
-
-  if (!author || !text) return;
-
-  let replyTo = null;
-
-  if (text.startsWith('> ')) {
-    const lines = text.split('\n');
-    const replyText = lines[0].substring(2);
-    replyTo = {
-      author,
-      text: replyText,
-    };
-  }
-
-  const newComment = {
-    id: Date.now(),
-    name: author,
-    text: text,
-    date: new Date().toLocaleString(),
-    likes: 0,
-    isLiked: false,
-    replyTo,
-  };
-
-  comments.push(newComment);
-
-  nameInput.value = '';
-  commentInput.value = '';
-  addButton.disabled = true;
-
-  renderComments();
-}
-
-export { initHandlers };
