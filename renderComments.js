@@ -1,8 +1,19 @@
 import { escapeHTML } from './escapeHTML.js';
+import { formatDate } from './formatDate.js';
 
 function renderComments(comments) {
   const commentsList = document.querySelector('.comments');
   commentsList.innerHTML = '';
+
+  if (isLoading) {
+    commentsList.innerHTML = '<div class="loading"></div>';
+    return;
+  }
+  
+  if (error) {
+    commentsList.innerHTML = `<div class="error">${error}</div>`;
+    return;
+  }
 
   comments.forEach((comment) => {
     const safeName = escapeHTML(comment.name);
@@ -12,10 +23,10 @@ function renderComments(comments) {
     commentElement.className = 'comment';
     commentElement.dataset.id = comment.id;
 
-    let html = `
+     let html = `
       <div class="comment-header">
         <div>${safeName}</div>
-        <div>${comment.date}</div>
+        <div>${formatDate(comment.createdAt || comment.date)}</div>
       </div>
     `;
 

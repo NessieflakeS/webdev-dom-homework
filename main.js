@@ -15,39 +15,38 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   initHandlers({
-    onAddComment: async (newComment) => {
-      try {
-        let replyTo = null;
-        let commentText = newComment.text;
+  onAddComment: async (newComment) => {
+    try {
+      let replyTo = null;
+      let commentText = newComment.text;
+      
+      if (commentText.startsWith('> ')) {
+        const lines = commentText.split('\n');
+        const replyMatch = lines[0].match(/^> (.+?): (.+)$/);
         
-        if (commentText.startsWith('> ')) {
-          const lines = commentText.split('\n');
-          const replyMatch = lines[0].match(/^> (.+?): (.+)$/);
-          
-          if (replyMatch) {
-            replyTo = {
-              author: replyMatch[1],
-              text: replyMatch[2]
-            };
-            commentText = lines.slice(1).join('\n').trim();
-          }
+        if (replyMatch) {
+          replyTo = {
+            author: replyMatch[1],
+            text: replyMatch[2]
+          };
+          commentText = lines.slice(1).join('\n').trim();
         }
-        
-        const savedComment = await postComment({
-          ...newComment,
-          text: commentText,
-          date: new Date().toLocaleString('ru-RU'),
-          likes: 0,
-          isLiked: false,
-          replyTo: replyTo
-        });
-        
-        comments = [savedComment, ...comments];
-        renderComments(comments);
-      } catch (error) {
-        alert(`Ошибка отправки: ${error.message}`);
       }
-    },
+      
+      const savedComment = await postComment({
+        ...newComment,
+        text: commentText,
+        likes: 0,
+        isLiked: false,
+        replyTo: replyTo
+      });
+      
+      comments = [savedComment, ...comments];
+      renderComments(comments);
+    } catch (error) {
+      alert(`Ошибка отправки: ${error.message}`);
+    }
+  },
     
     onToggleLike: async (commentId) => {
       try {
