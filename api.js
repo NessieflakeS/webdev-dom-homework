@@ -1,4 +1,4 @@
-const API_URL = "https://6891c1a2447ff4f11fbd9fda.mockapi.io/coments/:endpoint";
+const API_URL = "https://6891c1a2447ff4f11fbd9fda.mockapi.io/coments";
 
 const handleApiError = (response) => {
   if (response.status === 404) throw new Error("Ресурс не найден");
