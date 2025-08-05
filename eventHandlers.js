@@ -11,25 +11,27 @@ export function initHandlers({ onAddComment, onToggleLike, onReply }) {
   };
 
   commentsList.addEventListener('click', (event) => {
-    const target = event.target;
-    const commentElement = target.closest('.comment');
-    
+    const commentElement = event.target.closest('.comment');
     if (!commentElement) return;
 
     const commentId = commentElement.dataset.id;
 
-    if (target.classList.contains('like-button')) {
+    if (event.target.classList.contains('like-button')) {
       event.preventDefault();
       onToggleLike(commentId);
       return;
     }
 
-    if (target.classList.contains('comment-reply')) {
+    if (event.target.classList.contains('comment-reply')) {
       event.preventDefault();
-      const commentAuthor = commentElement.querySelector('.comment-header div:first-child').textContent;
-      const commentText = commentElement.querySelector('.comment-body').textContent;
-      onReply(commentAuthor, commentText);
+      const author = commentElement.querySelector('.comment-author').textContent;
+      const text = commentElement.querySelector('.comment-body').textContent;
+      onReply(author, text);
       return;
+    }
+
+    if (event.target.classList.contains('retry-btn')) {
+      window.location.reload();
     }
   });
 
@@ -37,7 +39,7 @@ export function initHandlers({ onAddComment, onToggleLike, onReply }) {
     event.preventDefault();
     
     const name = nameInput.value.trim();
-    let text = commentInput.value.trim();
+    const text = commentInput.value.trim();
     
     if (!name || !text) return;
     
@@ -53,5 +55,6 @@ export function initHandlers({ onAddComment, onToggleLike, onReply }) {
 
   nameInput.addEventListener('input', checkInputs);
   commentInput.addEventListener('input', checkInputs);
+  
   checkInputs();
 }

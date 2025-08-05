@@ -1,75 +1,51 @@
-const API_URL = "https://6891c1a2447ff4f11fbd9fda.mockapi.io/comments";
+const API_BASE_URL = "https://6891fd81447ff4f11fbeaced.mockapi.io/comments/comments";
+const API_URL = `${API_BASE_URL}/comments`;
 
-const handleApiError = (response) => {
-  if (response.status === 404) throw new Error("Ресурс не найден");
-  if (response.status === 500) throw new Error("Ошибка сервера");
-  if (response.status === 400) throw new Error("Некорректный запрос");
-  throw new Error(`Ошибка API: ${response.status} ${response.statusText}`);
+const makeRequest = async (endpoint, method = 'GET', body = null) => {
+  const options = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, options);
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`API Error (${method} ${endpoint}):`, error);
+    throw error;
+  }
 };
 
 export const getComments = async () => {
-  try {
-    const response = await fetch(`${API_URL}?sortBy=createdAt&order=desc`, {
-      method: 'GET',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    console.log('API Response Status:', response.status);
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('API Error Details:', errorData);
-      
-      if (response.status === 404) {
-        throw new Error("Ресурс не найден. Проверьте URL и существование ресурса в MockAPI.");
-      }
-      
-      throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    console.log('API Data Received:', data);
-    return data;
-  } catch (error) {
-    console.error("API Request Failed:", error);
-    throw new Error(`Не удалось загрузить комментарии: ${error.message}`);
-  }
+  return makeRequest('?sortBy=createdAt&order=desc');
 };
 
 export const postComment = async (comment) => {
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...comment,
-        createdAt: new Date().toISOString()
-      })
-    });
-    
-    if (!response.ok) handleApiError(response);
-    return await response.json();
-  } catch (error) {
-    console.error("API Error:", error);
-    throw error;
-  }
+  return makeRequest('', 'POST', {
+    ...comment,
+    createdAt: new Date().toISOString(),
+    likes: comment.likes || 0,
+    isLiked: comment.isLiked || false,
+    replyTo: comment.replyTo || null
+  });
 };
 
 export const updateComment = async (id, updates) => {
-  try {
-    const response = await fetch(`${API_URL}/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates)
-    });
-    
-    if (!response.ok) handleApiError(response);
-    return await response.json();
-  } catch (error) {
-    console.error("API Error:", error);
-    throw error;
-  }
+  return makeRequest(`/${id}`, 'PUT', updates);
+};
+
+export const deleteComment = async (id) => {
+  return makeRequest(`/${id}`, 'DELETE');
 };

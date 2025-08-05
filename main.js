@@ -2,44 +2,35 @@ import { renderComments } from './renderComments.js';
 import { initHandlers } from './eventHandlers.js';
 import { getComments, postComment, updateComment } from './api.js';
 
+let comments = [];
+let isLoading = false;
+let error = null;
+
 const loadComments = async () => {
+  isLoading = true;
+  renderComments(comments, isLoading, error);
+  
   try {
-    return await getComments();
-  } catch (apiError) {
-    console.error("Ошибка загрузки с MockAPI:", apiError);
-    
-    const localData = [
-      {
-        id: "fallback-1",
-        name: "Локальный пользователь",
-        text: "Данные загружены локально, так как MockAPI недоступен",
-        date: new Date().toLocaleString('ru-RU'),
-        likes: 0,
-        isLiked: false,
-        replyTo: null
-      }
-    ];
-    
-    return localData;
+    comments = await getComments();
+    error = null;
+  } catch (err) {
+    console.error('Failed to load comments:', err);
+    error = err;
+    comments = [];
+  } finally {
+    isLoading = false;
+    renderComments(comments, isLoading, error);
   }
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-  let comments = [];
-  const container = document.querySelector('.comments');
-  
-  renderComments([], true);
-  
-  try {
-    comments = await loadComments();
-    renderComments(comments);
-  } catch (error) {
-    console.error('Ошибка загрузки:', error);
-    renderComments([], false, `Ошибка загрузки комментариев: ${error.message}`);
-  }
+  await loadComments();
 
   initHandlers({
     onAddComment: async (newComment) => {
+      isLoading = true;
+      renderComments(comments, isLoading, error);
+      
       try {
         let replyTo = null;
         let commentText = newComment.text;
@@ -57,55 +48,52 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
         
-        renderComments(comments, true);
-        
         const savedComment = await postComment({
           ...newComment,
           text: commentText,
           likes: 0,
           isLiked: false,
-          replyTo: replyTo
+          replyTo
         });
         
         comments = [savedComment, ...comments];
-        renderComments(comments);
-      } catch (error) {
-        console.error('Ошибка отправки:', error);
-        renderComments(
-          comments, 
-          false, 
-          `Ошибка отправки комментария: ${error.message}`
-        );
+        error = null;
+      } catch (err) {
+        console.error('Failed to post comment:', err);
+        error = err;
+      } finally {
+        isLoading = false;
+        renderComments(comments, isLoading, error);
       }
     },
     
     onToggleLike: async (commentId) => {
+      const comment = comments.find(c => c.id === commentId);
+      if (!comment) return;
+      
+      isLoading = true;
+      renderComments(comments, isLoading, error);
+      
       try {
-        const comment = comments.find(c => c.id == commentId);
-        if (!comment) return;
-        
         const updatedComment = {
           ...comment,
           isLiked: !comment.isLiked,
           likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
         };
         
-        renderComments(comments, true);
-        
         await updateComment(commentId, {
           isLiked: updatedComment.isLiked,
           likes: updatedComment.likes
         });
         
-        comments = comments.map(c => c.id == commentId ? updatedComment : c);
-        renderComments(comments);
-      } catch (error) {
-        console.error('Ошибка при лайке:', error);
-        renderComments(
-          comments, 
-          false, 
-          `Ошибка обновления комментария: ${error.message}`
-        );
+        comments = comments.map(c => c.id === commentId ? updatedComment : c);
+        error = null;
+      } catch (err) {
+        console.error('Failed to update comment:', err);
+        error = err;
+      } finally {
+        isLoading = false;
+        renderComments(comments, isLoading, error);
       }
     },
     

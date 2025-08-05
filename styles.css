@@ -216,3 +216,45 @@ body {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
 }
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #bcec30;
+  font-size: 18px;
+}
+
+.error {
+  background: rgba(255, 0, 0, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+  color: #ff6b6b;
+  text-align: center;
+}
+
+.error button {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.empty {
+  text-align: center;
+  padding: 20px;
+  color: #aaa;
+  font-style: italic;
+}
+
+.comment {
+  transition: all 0.3s ease;
+}
+
+.comment:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
