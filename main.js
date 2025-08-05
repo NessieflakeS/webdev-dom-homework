@@ -4,49 +4,58 @@ import { getComments, postComment, updateComment } from './api.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   let comments = [];
+  const container = document.querySelector('.comments');
+  
+  renderComments([], true);
   
   try {
     comments = await getComments();
     renderComments(comments);
   } catch (error) {
     console.error('Ошибка загрузки:', error);
-    const container = document.querySelector('.comments');
-    container.innerHTML = `<div class="error">Ошибка загрузки комментариев: ${error.message}</div>`;
+    renderComments([], false, `Ошибка загрузки комментариев: ${error.message}`);
   }
 
   initHandlers({
-  onAddComment: async (newComment) => {
-    try {
-      let replyTo = null;
-      let commentText = newComment.text;
-      
-      if (commentText.startsWith('> ')) {
-        const lines = commentText.split('\n');
-        const replyMatch = lines[0].match(/^> (.+?): (.+)$/);
+    onAddComment: async (newComment) => {
+      try {
+        let replyTo = null;
+        let commentText = newComment.text;
         
-        if (replyMatch) {
-          replyTo = {
-            author: replyMatch[1],
-            text: replyMatch[2]
-          };
-          commentText = lines.slice(1).join('\n').trim();
+        if (commentText.startsWith('> ')) {
+          const lines = commentText.split('\n');
+          const replyMatch = lines[0].match(/^> (.+?): (.+)$/);
+          
+          if (replyMatch) {
+            replyTo = {
+              author: replyMatch[1],
+              text: replyMatch[2]
+            };
+            commentText = lines.slice(1).join('\n').trim();
+          }
         }
+        
+        renderComments(comments, true);
+        
+        const savedComment = await postComment({
+          ...newComment,
+          text: commentText,
+          likes: 0,
+          isLiked: false,
+          replyTo: replyTo
+        });
+        
+        comments = [savedComment, ...comments];
+        renderComments(comments);
+      } catch (error) {
+        console.error('Ошибка отправки:', error);
+        renderComments(
+          comments, 
+          false, 
+          `Ошибка отправки комментария: ${error.message}`
+        );
       }
-      
-      const savedComment = await postComment({
-        ...newComment,
-        text: commentText,
-        likes: 0,
-        isLiked: false,
-        replyTo: replyTo
-      });
-      
-      comments = [savedComment, ...comments];
-      renderComments(comments);
-    } catch (error) {
-      alert(`Ошибка отправки: ${error.message}`);
-    }
-  },
+    },
     
     onToggleLike: async (commentId) => {
       try {
@@ -59,6 +68,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
         };
         
+        renderComments(comments, true);
+        
         await updateComment(commentId, {
           isLiked: updatedComment.isLiked,
           likes: updatedComment.likes
@@ -68,6 +79,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderComments(comments);
       } catch (error) {
         console.error('Ошибка при лайке:', error);
+        renderComments(
+          comments, 
+          false, 
+          `Ошибка обновления комментария: ${error.message}`
+        );
       }
     },
     

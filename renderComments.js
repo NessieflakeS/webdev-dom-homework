@@ -1,10 +1,11 @@
 import { escapeHTML } from './escapeHTML.js';
 import { formatDate } from './formatDate.js';
 
-function renderComments(comments) {
+function renderComments(comments, isLoading = false, error = null) {
   const commentsList = document.querySelector('.comments');
+  
   commentsList.innerHTML = '';
-
+  
   if (isLoading) {
     commentsList.innerHTML = '<div class="loading"></div>';
     return;
@@ -14,22 +15,27 @@ function renderComments(comments) {
     commentsList.innerHTML = `<div class="error">${error}</div>`;
     return;
   }
-
+  
+  if (!comments || comments.length === 0) {
+    commentsList.innerHTML = '<div class="empty-state">Пока нет комментариев</div>';
+    return;
+  }
+  
   comments.forEach((comment) => {
     const safeName = escapeHTML(comment.name);
     const safeText = escapeHTML(comment.text);
-
+    
     const commentElement = document.createElement('li');
     commentElement.className = 'comment';
     commentElement.dataset.id = comment.id;
-
-     let html = `
+    
+    let html = `
       <div class="comment-header">
         <div>${safeName}</div>
         <div>${formatDate(comment.createdAt || comment.date)}</div>
       </div>
     `;
-
+    
     if (comment.replyTo) {
       const safeReplyAuthor = escapeHTML(comment.replyTo.author);
       const safeReplyText = escapeHTML(comment.replyTo.text);
@@ -37,7 +43,7 @@ function renderComments(comments) {
         <div class="reply-text">→ Ответ на ${safeReplyAuthor}: ${safeReplyText}</div>
       `;
     }
-
+    
     html += `
       <div class="comment-body">${safeText}</div>
       <div class="comment-footer">
@@ -48,7 +54,7 @@ function renderComments(comments) {
         </div>
       </div>
     `;
-
+    
     commentElement.innerHTML = html;
     commentsList.appendChild(commentElement);
   });
