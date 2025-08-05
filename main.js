@@ -2,6 +2,28 @@ import { renderComments } from './renderComments.js';
 import { initHandlers } from './eventHandlers.js';
 import { getComments, postComment, updateComment } from './api.js';
 
+const loadComments = async () => {
+  try {
+    return await getComments();
+  } catch (apiError) {
+    console.error("Ошибка загрузки с MockAPI:", apiError);
+    
+    const localData = [
+      {
+        id: "fallback-1",
+        name: "Локальный пользователь",
+        text: "Данные загружены локально, так как MockAPI недоступен",
+        date: new Date().toLocaleString('ru-RU'),
+        likes: 0,
+        isLiked: false,
+        replyTo: null
+      }
+    ];
+    
+    return localData;
+  }
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
   let comments = [];
   const container = document.querySelector('.comments');
@@ -9,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderComments([], true);
   
   try {
-    comments = await getComments();
+    comments = await loadComments();
     renderComments(comments);
   } catch (error) {
     console.error('Ошибка загрузки:', error);
