@@ -18,10 +18,26 @@ export const getComments = async () => {
     const snapshot = await database.ref('comments').once('value');
     const comments = snapshot.val() || {};
     
-    return Object.keys(comments).map(key => ({
-      id: key,
-      ...comments[key]
-    }));
+    return Object.keys(comments).map(key => {
+      const comment = comments[key];
+      
+      if (typeof comment.date === 'string') {
+        const [datePart, timePart] = comment.date.split(', ');
+        const [day, month, year] = datePart.split('.');
+        const [hour, minute, second] = timePart.split(':');
+        
+        return {
+          id: key,
+          ...comment,
+          date: new Date(year, month - 1, day, hour, minute, second).getTime()
+        };
+      }
+      
+      return {
+        id: key,
+        ...comment
+      };
+    });
   } catch (error) {
     console.error("Firebase Error:", error);
     return [];

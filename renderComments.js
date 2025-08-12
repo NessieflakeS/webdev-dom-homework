@@ -36,10 +36,6 @@ function renderComments(comments, isLoading = false, error = null) {
     return;
   }
 
-  if (comment.isSending) {
-    commentElement.innerHTML += '<div class="sending-indicator">Отправка...</div>';
-  }
-
   comments.forEach(comment => {
     const commentElement = document.createElement('li');
     commentElement.className = 'comment';
@@ -60,6 +56,11 @@ function renderComments(comments, isLoading = false, error = null) {
       `;
     }
 
+    let sendingIndicator = '';
+    if (comment.isSending) {
+      sendingIndicator = '<div class="sending-indicator">Отправка...</div>';
+    }
+
     commentElement.innerHTML = `
       <div class="comment-header">
         <div class="comment-author">${safeName}</div>
@@ -71,23 +72,18 @@ function renderComments(comments, isLoading = false, error = null) {
         <button class="comment-reply">Ответить</button>
         <div class="likes">
           <span class="likes-counter">${comment.likes || 0}</span>
-          <button class="like-button ${comment.isLiked ? '-active-like' : ''}">
+          <button class="like-button 
+            ${comment.isLiked ? '-active-like' : ''}
+            ${comment.isLikeLoading ? '-loading-like' : ''}">
             ♥
           </button>
         </div>
       </div>
-      <div class="likes">
-      <span class="likes-counter">${comment.likes || 0}</span>
-      <button class="like-button 
-      ${comment.isLiked ? '-active-like' : ''}
-      ${comment.isLikeLoading ? '-loading-like' : ''}">
-      ♥
-      </button>
-      </div>
+      ${sendingIndicator}
     `;
 
     commentsList.appendChild(commentElement);
   });
 }
 
-export { renderComments }
+export { renderComments };
