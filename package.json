@@ -1,0 +1,13 @@
+{
+  "name": "comments-project",
+  "version": "1.0.0",
+  "description": "Project for comments app",
+  "main": "main.js",
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write \"**/*.{js,html,css}\""},
+  "devDependencies": {
+    "eslint": "^9.31.0",
+    "eslint-config-prettier": "^10.1.5",
+    "prettier": "^3.6.2"}
+}
