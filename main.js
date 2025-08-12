@@ -36,6 +36,7 @@ function setFormDisabled(disabled) {
   const addButton = document.querySelector('.add-form-button');
   const nameInput = document.querySelector('.add-form-name');
   const commentInput = document.querySelector('.add-form-text');
+  const addForm = document.querySelector('.add-form');
   
   if (addButton) {
     addButton.disabled = disabled;
@@ -44,12 +45,14 @@ function setFormDisabled(disabled) {
   
   if (nameInput) nameInput.disabled = disabled;
   if (commentInput) commentInput.disabled = disabled;
-}
-
-function delay(interval = 300) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), interval);
-  });
+  
+  if (addForm) {
+    if (disabled) {
+      addForm.classList.add('-loading');
+    } else {
+      addForm.classList.remove('-loading');
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

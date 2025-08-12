@@ -278,3 +278,66 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+.add-form {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.add-form-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(32, 32, 32, 0.7);
+  backdrop-filter: blur(3px);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.add-form.-loading .add-form-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+.add-form-loading {
+  color: #bcec30;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
+  background: rgba(53, 53, 53, 0.8);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.add-form-loading::before {
+  content: "";
+  display: block;
+  width: 25px;
+  height: 25px;
+  border: 3px solid rgba(188, 236, 48, 0.3);
+  border-radius: 50%;
+  border-top-color: #bcec30;
+  animation: spin 1s ease-in-out infinite;
+}
+
+.loading::before {
+  width: 25px;
+  height: 25px;
+  border-width: 3px;
+  margin-bottom: 5px;
+}
+
+.loading {
+  font-size: 14px;
+}
