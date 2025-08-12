@@ -13,7 +13,6 @@ const formatDate = (timestamp) => {
 
 function renderComments(comments, isLoading = false, error = null) {
   const commentsList = document.querySelector('.comments');
-  
   commentsList.innerHTML = '';
 
   if (isLoading) {
@@ -47,8 +46,8 @@ function renderComments(comments, isLoading = false, error = null) {
 
     let replySection = '';
     if (comment.replyTo) {
-      const safeReplyAuthor = escapeHTML(comment.replyTo.author);
-      const safeReplyText = escapeHTML(comment.replyTo.text);
+      const safeReplyAuthor = escapeHTML(comment.replyTo.author || '');
+      const safeReplyText = escapeHTML(comment.replyTo.text || '');
       replySection = `
         <div class="reply-text">
           → Ответ на ${safeReplyAuthor}: ${safeReplyText}

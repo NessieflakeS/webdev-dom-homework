@@ -1,4 +1,5 @@
 function escapeHTML(str) {
+  if (!str) return ''; 
   return str
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')

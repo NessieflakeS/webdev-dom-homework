@@ -21,18 +21,23 @@ export const getComments = async () => {
     return Object.keys(comments).map(key => {
       const comment = comments[key];
       
-      if (typeof comment.date === 'string') {
-        return {
-          id: key,
-          ...comment,
-          date: new Date(comment.date).getTime() || Date.now()
-        };
+      let dateValue = comment.date;
+      if (typeof dateValue === 'string') {
+        try {
+          dateValue = new Date(dateValue).getTime();
+        } catch (e) {
+          dateValue = Date.now();
+        }
       }
       
       return {
         id: key,
-        ...comment,
-        date: comment.date || Date.now()
+        name: comment.name || 'Аноним',
+        text: comment.text || '',
+        likes: comment.likes || 0,
+        isLiked: comment.isLiked || false,
+        replyTo: comment.replyTo || null,
+        date: dateValue || Date.now()
       };
     });
   } catch (error) {

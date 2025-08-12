@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
         error = null;
       } catch (err) {
-        console.error('Failed to update like:', err);
+        console.error('Ошибка при обновлении лайка:', err);
         error = err;
         comments = comments.map(c => c.id === commentId 
           ? { ...comment, isLikeLoading: false } 
