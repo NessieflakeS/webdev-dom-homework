@@ -1,4 +1,5 @@
-body {
+html, body {
+  overflow-x: hidden;
   margin: 0;
 }
 
@@ -12,6 +13,11 @@ body {
   padding-bottom: 200px;
   background: #202020;
   min-height: 100vh;
+  justify-content: flex-start;
+}
+
+body.-noscroll {
+  overflow: hidden;
 }
 
 .comments,
@@ -290,8 +296,8 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(32, 32, 32, 0.7);
-  backdrop-filter: blur(3px);
+  background: rgba(32, 32, 32, 0.85);
+  backdrop-filter: blur(5px);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -314,10 +320,10 @@ body {
 
 .add-form-loading {
   color: #bcec30;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: bold;
   text-align: center;
-  padding: 30px 40px;
+  padding: 25px 40px;
   background: rgba(53, 53, 53, 0.95);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   max-width: 80%;
@@ -327,11 +333,15 @@ body {
   gap: 15px;
   animation: fadeInScale 1s ease-out forwards;
   opacity: 0;
-  transform: scale(0.95);
-  position: relative;
-  top: 0;
-  left: 0;
+  transform: translate(-50%, -50%);;
+  position: fixed;
+  top: 50%;
+  left: 50%;
   margin: auto;
+  z-index: 100;
+  width: auto;
+  max-width: 90%;
+
 }
 
 .add-form-loading::before {

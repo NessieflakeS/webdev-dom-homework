@@ -2,6 +2,21 @@ import { renderComments } from './renderComments.js';
 import { initHandlers } from './eventHandlers.js';
 import { getComments, postComment, updateComment } from './api.js';
 
+function delay(interval = 300) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), interval);
+  });
+}
+
+function disablePageScroll() {
+  document.body.classList.add('-noscroll');
+  window.scrollTo(0, window.pageYOffset);
+}
+
+function enablePageScroll() {
+  document.body.classList.remove('-noscroll');
+}
+
 let comments = [];
 let isLoading = false;
 let error = null;
@@ -12,15 +27,6 @@ const loadComments = async () => {
   
   try {
     comments = await getComments();
-    comments = comments.map(comment => {
-      if (typeof comment.date === 'string') {
-        return {
-          ...comment,
-          date: new Date(comment.date).getTime()
-        };
-      }
-      return comment;
-    });
     error = null;
   } catch (err) {
     console.error('Failed to load comments:', err);
@@ -49,8 +55,18 @@ function setFormDisabled(disabled) {
   if (addForm) {
     if (disabled) {
       addForm.classList.add('-loading');
+      disablePageScroll();
+      
+      setTimeout(() => {
+        addForm.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'center'
+        });
+      }, 100);
     } else {
       addForm.classList.remove('-loading');
+      enablePageScroll();
     }
   }
 }
@@ -61,14 +77,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   initHandlers({
     onAddComment: async (newComment) => {
       isLoading = true;
-      const startTime = Date.now();
+      const startTime = Date.now(); 
       setFormDisabled(true);
       renderComments(comments, isLoading, error);
       
       try {
         let replyTo = null;
         let commentText = newComment.text;
-        const minDisplayTime = 2000;
         
         if (commentText.startsWith('> ')) {
           const lines = commentText.split('\n');
@@ -105,10 +120,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           isLiked: false,
           replyTo
         });
-
+        
         const elapsed = Date.now() - startTime;
-        const remaining = Math.max(minDisplayTime - elapsed, 0);
-        await new Promise(resolve => setTimeout(resolve, remaining));
+        const remainingDelay = Math.max(2000 - elapsed, 0);
+        await delay(remainingDelay);
         
         comments = [savedComment, ...comments.filter(c => c.id !== null)];
         error = null;
