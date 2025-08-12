@@ -61,12 +61,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   initHandlers({
     onAddComment: async (newComment) => {
       isLoading = true;
+      const startTime = Date.now();
       setFormDisabled(true);
       renderComments(comments, isLoading, error);
       
       try {
         let replyTo = null;
         let commentText = newComment.text;
+        const minDisplayTime = 2000;
         
         if (commentText.startsWith('> ')) {
           const lines = commentText.split('\n');
@@ -103,6 +105,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           isLiked: false,
           replyTo
         });
+
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(minDisplayTime - elapsed, 0);
+        await new Promise(resolve => setTimeout(resolve, remaining));
         
         comments = [savedComment, ...comments.filter(c => c.id !== null)];
         error = null;
