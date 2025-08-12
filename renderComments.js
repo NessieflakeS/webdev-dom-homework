@@ -1,47 +1,79 @@
-import { comments } from './comments.js';
 import { escapeHTML } from './escapeHTML.js';
 
-function renderComments() {
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+function renderComments(comments, isLoading = false, error = null) {
   const commentsList = document.querySelector('.comments');
+  
   commentsList.innerHTML = '';
 
-  comments.forEach((comment) => {
-    const safeName = escapeHTML(comment.name);
-    const safeText = escapeHTML(comment.text);
+  if (isLoading) {
+    commentsList.innerHTML = '<div class="loading">Загрузка...</div>';
+    return;
+  }
 
+  if (error) {
+    commentsList.innerHTML = `
+      <div class="error">
+        Ошибка: ${error.message}
+        <button class="retry-btn">Повторить</button>
+      </div>
+    `;
+    return;
+  }
+
+  if (!comments || comments.length === 0) {
+    commentsList.innerHTML = '<div class="empty">Комментариев пока нет</div>';
+    return;
+  }
+
+  comments.forEach(comment => {
     const commentElement = document.createElement('li');
     commentElement.className = 'comment';
     commentElement.dataset.id = comment.id;
 
-    let html = `
+    const safeName = escapeHTML(comment.name);
+    const safeText = escapeHTML(comment.text);
+    const date = formatDate(comment.createdAt || comment.date);
+
+    let replySection = '';
+    if (comment.replyTo) {
+      const safeReplyAuthor = escapeHTML(comment.replyTo.author);
+      const safeReplyText = escapeHTML(comment.replyTo.text);
+      replySection = `
+        <div class="reply-text">
+          → Ответ на ${safeReplyAuthor}: ${safeReplyText}
+        </div>
+      `;
+    }
+
+    commentElement.innerHTML = `
       <div class="comment-header">
-        <div>${safeName}</div>
-        <div>${comment.date}</div>
+        <div class="comment-author">${safeName}</div>
+        <div class="comment-date">${date}</div>
       </div>
+      ${replySection}
       <div class="comment-body">${safeText}</div>
       <div class="comment-footer">
+        <button class="comment-reply">Ответить</button>
         <div class="likes">
-          <span class="likes-counter">${comment.likes}</span>
-          <button class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
+          <span class="likes-counter">${comment.likes || 0}</span>
+          <button class="like-button ${comment.isLiked ? '-active-like' : ''}">
+            ♥
+          </button>
         </div>
       </div>
     `;
 
-    if (comment.replyTo) {
-      const safeReplyText = escapeHTML(comment.replyTo.text);
-      const safeReplyName = escapeHTML(comment.replyTo.author);
-      html = `
-        <div class="comment-header">
-          <div>${safeName}</div>
-          <div>${comment.date}</div>
-        </div>
-        <div class="reply-text">→ Ответ на ${safeReplyName}: ${safeReplyText}</div>
-        <div class="comment-body">${safeText}</div>
-        ${html.split('<div class="comment-footer">')[1]}
-      `;
-    }
-
-    commentElement.innerHTML = html;
     commentsList.appendChild(commentElement);
   });
 }
