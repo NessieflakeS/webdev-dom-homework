@@ -23,18 +23,31 @@ const loadComments = async () => {
   }
 };
 
+function setFormDisabled(disabled) {
+  const addButton = document.querySelector('.add-form-button');
+  const nameInput = document.querySelector('.add-form-name');
+  const commentInput = document.querySelector('.add-form-text');
+  
+  if (addButton) addButton.disabled = disabled;
+  if (nameInput) nameInput.disabled = disabled;
+  if (commentInput) commentInput.disabled = disabled;
+}
+
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadComments();
 
   initHandlers({
     onAddComment: async (newComment) => {
       isLoading = true;
+      setFormDisabled(true);
       renderComments(comments, isLoading, error);
       
       try {
         let replyTo = null;
         let commentText = newComment.text;
-        
+        await postComment({ /* данные */ });
+
         if (commentText.startsWith('> ')) {
           const lines = commentText.split('\n');
           const replyMatch = lines[0].match(/^> (.+?): (.+)$/);
@@ -63,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         error = err;
       } finally {
         isLoading = false;
+        setFormDisabled(false); 
         renderComments(comments, isLoading, error);
       }
     },
@@ -104,3 +118,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
+function delay(interval = 300) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), interval);
+  });
+}
+
+onToggleLike: async (commentId) => {
+  const comment = comments.find(c => c.id === commentId);
+  if (!comment) return;
+  
+  comments = comments.map(c => c.id === commentId 
+    ? { ...c, isLikeLoading: true } 
+    : c
+  );
+  renderComments(comments, isLoading, error);
+  
+  try {
+    await delay(2000);
+    
+    const updatedComment = {
+      ...comment,
+      isLiked: !comment.isLiked,
+      likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1,
+      isLikeLoading: false
+    };
+    
+    comments = comments.map(c => c.id === commentId ? updatedComment : c);
+  } catch (err) {
+    console.error('Failed to update like:', err);
+    comments = comments.map(c => c.id === commentId 
+      ? { ...c, isLikeLoading: false } 
+      : c
+    );
+  } finally {
+    renderComments(comments, isLoading, error);
+  }
+}
