@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           replyTo
         });
         
-        comments = [savedComment, ...comments];
+        comments = [savedComment, ...comments.filter(c => c.id !== savedComment.id)];
         error = null;
       } catch (err) {
         console.error('Failed to post comment:', err);
