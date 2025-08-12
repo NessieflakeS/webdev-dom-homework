@@ -1,7 +1,7 @@
 import { escapeHTML } from './escapeHTML.js';
 
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
+const formatDate = (timestamp) => {
+  const date = new Date(timestamp);
   return date.toLocaleString('ru-RU', {
     day: '2-digit',
     month: '2-digit',
@@ -36,6 +36,10 @@ function renderComments(comments, isLoading = false, error = null) {
     return;
   }
 
+  if (comment.isSending) {
+    commentElement.innerHTML += '<div class="sending-indicator">Отправка...</div>';
+  }
+
   comments.forEach(comment => {
     const commentElement = document.createElement('li');
     commentElement.className = 'comment';
@@ -43,7 +47,7 @@ function renderComments(comments, isLoading = false, error = null) {
 
     const safeName = escapeHTML(comment.name);
     const safeText = escapeHTML(comment.text);
-    const date = formatDate(comment.createdAt || comment.date);
+    const date = formatDate(comment.date);
 
     let replySection = '';
     if (comment.replyTo) {
@@ -75,9 +79,9 @@ function renderComments(comments, isLoading = false, error = null) {
       <div class="likes">
       <span class="likes-counter">${comment.likes || 0}</span>
       <button class="like-button 
-        ${comment.isLiked ? '-active-like' : ''}
-        ${comment.isLikeLoading ? '-loading-like' : ''}">
-        ♥
+      ${comment.isLiked ? '-active-like' : ''}
+      ${comment.isLikeLoading ? '-loading-like' : ''}">
+      ♥
       </button>
       </div>
     `;
@@ -86,4 +90,4 @@ function renderComments(comments, isLoading = false, error = null) {
   });
 }
 
-export { renderComments };
+export { renderComments }

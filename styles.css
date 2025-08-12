@@ -269,3 +269,22 @@ body {
 .-loading-like {
   animation: rotating 1s linear infinite;
 }
+
+.sending-indicator {
+  color: #bcec30;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.likes {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

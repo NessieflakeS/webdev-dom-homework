@@ -18,7 +18,6 @@ export const getComments = async () => {
     const snapshot = await database.ref('comments').once('value');
     const comments = snapshot.val() || {};
     
-    // Конвертируем объект в массив
     return Object.keys(comments).map(key => ({
       id: key,
       ...comments[key]
@@ -32,9 +31,11 @@ export const getComments = async () => {
 export const postComment = async (comment) => {
   try {
     const newCommentRef = database.ref('comments').push();
+    const timestamp = Date.now();
+    
     await newCommentRef.set({
       ...comment,
-      date: new Date().toLocaleString('ru-RU'),
+      date: timestamp, 
       likes: 0,
       isLiked: false,
       replyTo: comment.replyTo || null
@@ -42,7 +43,8 @@ export const postComment = async (comment) => {
     
     return {
       id: newCommentRef.key,
-      ...comment
+      ...comment,
+      date: timestamp 
     };
   } catch (error) {
     console.error("Firebase Error:", error);

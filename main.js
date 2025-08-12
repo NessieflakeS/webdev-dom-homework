@@ -28,7 +28,11 @@ function setFormDisabled(disabled) {
   const nameInput = document.querySelector('.add-form-name');
   const commentInput = document.querySelector('.add-form-text');
   
-  if (addButton) addButton.disabled = disabled;
+  if (addButton) {
+    addButton.disabled = disabled;
+    addButton.textContent = disabled ? 'Отправка...' : 'Написать';
+  }
+  
   if (nameInput) nameInput.disabled = disabled;
   if (commentInput) commentInput.disabled = disabled;
 }
@@ -39,47 +43,47 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   initHandlers({
     onAddComment: async (newComment) => {
-      isLoading = true;
-      setFormDisabled(true);
-      renderComments(comments, isLoading, error);
-      
-      try {
-        let replyTo = null;
-        let commentText = newComment.text;
-        await postComment({ /* данные */ });
-
-        if (commentText.startsWith('> ')) {
-          const lines = commentText.split('\n');
-          const replyMatch = lines[0].match(/^> (.+?): (.+)$/);
-          
-          if (replyMatch) {
-            replyTo = {
-              author: replyMatch[1],
-              text: replyMatch[2]
-            };
-            commentText = lines.slice(1).join('\n').trim();
-          }
-        }
-        
-        const savedComment = await postComment({
-          ...newComment,
-          text: commentText,
-          likes: 0,
-          isLiked: false,
-          replyTo
-        });
-        
-        comments = [savedComment, ...comments.filter(c => c.id !== savedComment.id)];
-        error = null;
-      } catch (err) {
-        console.error('Failed to post comment:', err);
-        error = err;
-      } finally {
-        isLoading = false;
-        setFormDisabled(false); 
-        renderComments(comments, isLoading, error);
-      }
-    },
+  isLoading = true;
+  setFormDisabled(true);
+  renderComments(comments, isLoading, error);
+  
+  try {
+    
+    const tempComment = {
+      id: null, 
+      ...newComment,
+      date: Date.now(), 
+      likes: 0,
+      isLiked: false,
+      replyTo,
+      isSending: true
+    };
+    
+    comments = [tempComment, ...comments];
+    renderComments(comments, isLoading, error);
+    
+    const savedComment = await postComment({
+      ...newComment,
+      text: commentText,
+      date: tempComment.date, // Используем тот же timestamp
+      likes: 0,
+      isLiked: false,
+      replyTo
+    });
+    
+    comments = [savedComment, ...comments.filter(c => c.id !== null)];
+    error = null;
+  } catch (err) {
+    console.error('Failed to post comment:', err);
+    error = err;
+    
+    comments = comments.filter(c => c.id !== null);
+  } finally {
+    isLoading = false;
+    setFormDisabled(false);
+    renderComments(comments, isLoading, error);
+  }
+},
     
     onToggleLike: async (commentId) => {
       const comment = comments.find(c => c.id === commentId);
@@ -129,10 +133,12 @@ onToggleLike: async (commentId) => {
   const comment = comments.find(c => c.id === commentId);
   if (!comment) return;
   
-  comments = comments.map(c => c.id === commentId 
-    ? { ...c, isLikeLoading: true } 
-    : c
-  );
+  const tempComment = {
+    ...comment,
+    isLikeLoading: true
+  };
+  
+  comments = comments.map(c => c.id === commentId ? tempComment : c);
   renderComments(comments, isLoading, error);
   
   try {
@@ -141,15 +147,22 @@ onToggleLike: async (commentId) => {
     const updatedComment = {
       ...comment,
       isLiked: !comment.isLiked,
-      likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1,
-      isLikeLoading: false
+      likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
     };
     
-    comments = comments.map(c => c.id === commentId ? updatedComment : c);
+    await updateComment(commentId, {
+      isLiked: updatedComment.isLiked,
+      likes: updatedComment.likes
+    });
+    
+    comments = comments.map(c => c.id === commentId 
+      ? { ...updatedComment, isLikeLoading: false } 
+      : c
+    );
   } catch (err) {
     console.error('Failed to update like:', err);
     comments = comments.map(c => c.id === commentId 
-      ? { ...c, isLikeLoading: false } 
+      ? { ...comment, isLikeLoading: false } 
       : c
     );
   } finally {
