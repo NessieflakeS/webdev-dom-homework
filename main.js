@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const tempComment = {
           id: null, 
-          ...newComment,
+          name: newComment.name,
           text: commentText,
           date: Date.now(),
           likes: 0,
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderComments(comments, isLoading, error);
         
         const savedComment = await postComment({
-          ...newComment,
+          name: newComment.name,
           text: commentText,
           date: tempComment.date,
           likes: 0,

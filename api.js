@@ -22,20 +22,17 @@ export const getComments = async () => {
       const comment = comments[key];
       
       if (typeof comment.date === 'string') {
-        const [datePart, timePart] = comment.date.split(', ');
-        const [day, month, year] = datePart.split('.');
-        const [hour, minute, second] = timePart.split(':');
-        
         return {
           id: key,
           ...comment,
-          date: new Date(year, month - 1, day, hour, minute, second).getTime()
+          date: new Date(comment.date).getTime() || Date.now()
         };
       }
       
       return {
         id: key,
-        ...comment
+        ...comment,
+        date: comment.date || Date.now()
       };
     });
   } catch (error) {

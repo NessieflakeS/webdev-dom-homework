@@ -56,11 +56,6 @@ function renderComments(comments, isLoading = false, error = null) {
       `;
     }
 
-    let sendingIndicator = '';
-    if (comment.isSending) {
-      sendingIndicator = '<div class="sending-indicator">Отправка...</div>';
-    }
-
     commentElement.innerHTML = `
       <div class="comment-header">
         <div class="comment-author">${safeName}</div>
@@ -79,7 +74,7 @@ function renderComments(comments, isLoading = false, error = null) {
           </button>
         </div>
       </div>
-      ${sendingIndicator}
+      ${comment.isSending ? '<div class="sending-indicator">Отправка...</div>' : ''}
     `;
 
     commentsList.appendChild(commentElement);
