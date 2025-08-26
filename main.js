@@ -110,38 +110,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     
     onToggleLike: async (commentId) => {
-      const comment = comments.find(c => c.id === commentId);
-      if (!comment) return;
+      const commentIndex = comments.findIndex(c => c.id == commentId);
+      if (commentIndex === -1) return;
       
-      const tempComment = {
+      const updatedComments = [...comments];
+      const comment = updatedComments[commentIndex];
+      
+      updatedComments[commentIndex] = {
         ...comment,
         isLikeLoading: true
       };
       
-      comments = comments.map(c => c.id === commentId ? tempComment : c);
+      comments = updatedComments;
       renderComments(comments, isLoading, error);
       
       try {
-        const updatedComment = {
-          ...comment,
-          isLiked: !comment.isLiked,
-          likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
-        };
-        
         await delay(1000);
         
-        comments = comments.map(c => c.id === commentId 
-          ? { ...updatedComment, isLikeLoading: false } 
-          : c
-        );
+        const finalComments = [...comments];
+        finalComments[commentIndex] = {
+          ...comment,
+          isLiked: !comment.isLiked,
+          likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1,
+          isLikeLoading: false
+        };
+        
+        comments = finalComments;
         error = null;
       } catch (err) {
         console.error('Ошибка при обновлении лайка:', err);
         error = err;
-        comments = comments.map(c => c.id === commentId 
-          ? { ...comment, isLikeLoading: false } 
-          : c
-        );
+        const restoredComments = [...comments];
+        restoredComments[commentIndex] = {
+          ...comment,
+          isLikeLoading: false
+        };
+        comments = restoredComments;
       } finally {
         renderComments(comments, isLoading, error);
       }

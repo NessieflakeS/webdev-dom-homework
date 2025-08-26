@@ -11,25 +11,26 @@ export function initHandlers({ onAddComment, onToggleLike, onReply, onRetry }) {
   };
 
   commentsList.addEventListener('click', (event) => {
-    const commentElement = event.target.closest('.comment');
-    
     if (event.target.classList.contains('retry-btn')) {
       onRetry();
       return;
     }
 
-    if (!commentElement) return;
-
-    const commentId = commentElement.dataset.id;
-
     if (event.target.classList.contains('like-button')) {
       event.preventDefault();
+      const commentElement = event.target.closest('.comment');
+      if (!commentElement) return;
+      
+      const commentId = commentElement.dataset.id;
       onToggleLike(commentId);
       return;
     }
 
     if (event.target.classList.contains('comment-reply')) {
       event.preventDefault();
+      const commentElement = event.target.closest('.comment');
+      if (!commentElement) return;
+      
       const author = commentElement.querySelector('.comment-author').textContent;
       const text = commentElement.querySelector('.comment-body').textContent;
       onReply(author, text);

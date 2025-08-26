@@ -168,23 +168,6 @@ body.-noscroll {
   border-left: 2px solid #bcec30;
 }
 
-.error {
-  color: #ff6b6b;
-  padding: 20px;
-  background: rgba(255, 107, 107, 0.1);
-  border-radius: 8px;
-  margin: 20px 0;
-}
-
-.error {
-  color: #ff6b6b;
-  padding: 20px;
-  background: rgba(255, 107, 107, 0.1);
-  border-radius: 8px;
-  margin: 20px 0;
-  text-align: center;
-}
-
 .empty-state {
   color: #aaa;
   padding: 30px;

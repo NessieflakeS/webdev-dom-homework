@@ -44,6 +44,10 @@ function renderComments(comments, isLoading = false, error = null) {
     const safeText = escapeHTML(comment.text);
     const date = formatDate(comment.date);
 
+    let likeButtonClass = 'like-button';
+    if (comment.isLiked) likeButtonClass += ' -active-like';
+    if (comment.isLikeLoading) likeButtonClass += ' -loading-like';
+
     commentElement.innerHTML = `
       <div class="comment-header">
         <div class="comment-author">${safeName}</div>
@@ -54,9 +58,7 @@ function renderComments(comments, isLoading = false, error = null) {
         <button class="comment-reply">Ответить</button>
         <div class="likes">
           <span class="likes-counter">${comment.likes || 0}</span>
-          <button class="like-button 
-            ${comment.isLiked ? '-active-like' : ''}
-            ${comment.isLikeLoading ? '-loading-like' : ''}">
+          <button class="${likeButtonClass}">
             ♥
           </button>
         </div>
