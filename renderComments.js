@@ -61,6 +61,7 @@ function renderComments(comments, isLoading = false, error = null) {
           </button>
         </div>
       </div>
+      ${comment.isSending ? '<div class="sending-indicator">Отправка...</div>' : ''}
     `;
 
     commentsList.appendChild(commentElement);

@@ -2,6 +2,12 @@ import { renderComments } from './renderComments.js';
 import { initHandlers } from './eventHandlers.js';
 import { getComments, postComment, updateComment } from './api.js';
 
+function delay(interval = 300) {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(), interval);
+  });
+}
+
 function disablePageScroll() {
   document.body.classList.add('-noscroll');
   window.scrollTo(0, window.pageYOffset);
@@ -62,10 +68,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   initHandlers({
     onAddComment: async (newComment) => {
+      const startTime = Date.now();
       setFormDisabled(true);
       
       try {
-        comments = await postComment(newComment);
+        const tempComment = {
+          id: 'temp-' + Date.now(),
+          name: newComment.name,
+          text: newComment.text,
+          date: Date.now(),
+          likes: 0,
+          isLiked: false,
+          isSending: true
+        };
+        
+        comments = [...comments, tempComment]; // Добавляем в конец
+        renderComments(comments, isLoading, error);
+        
+        const updatedComments = await postComment(newComment);
+        
+        const elapsed = Date.now() - startTime;
+        const remainingDelay = Math.max(2000 - elapsed, 0);
+        await delay(remainingDelay);
+        
+        comments = updatedComments;
         error = null;
         
         const nameInput = document.querySelector('.add-form-name');
@@ -76,6 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch (err) {
         console.error('Failed to post comment:', err);
         error = err;
+        comments = comments.filter(c => !c.isSending);
       } finally {
         setFormDisabled(false);
         renderComments(comments, isLoading, error);
@@ -101,10 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
         };
         
-        await updateComment(commentId, {
-          isLiked: updatedComment.isLiked,
-          likes: updatedComment.likes
-        });
+        await delay(1000);
         
         comments = comments.map(c => c.id === commentId 
           ? { ...updatedComment, isLikeLoading: false } 
