@@ -16,8 +16,8 @@ export const getComments = async () => {
       id: comment.id,
       name: comment.author.name,
       text: comment.text,
-      likes: comment.likes,
-      isLiked: comment.isLiked,
+      likes: comment.likes || 0,
+      isLiked: comment.isLiked || false,
       date: new Date(comment.date).getTime()
     }));
   } catch (error) {
@@ -28,36 +28,28 @@ export const getComments = async () => {
 
 export const postComment = async (comment) => {
   try {
+    const formData = new FormData();
+    formData.append('text', comment.text);
+    formData.append('name', comment.name);
+
     const response = await fetch(`${BASE_URL}/comments`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        text: comment.text,
-        name: comment.name
-      })
+      body: formData
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      throw new Error(data.error || 'Ошибка сервера');
+      const errorData = await response.text();
+      throw new Error(errorData || 'Ошибка сервера');
     }
 
-    const updatedResponse = await fetch(`${BASE_URL}/comments`);
-    const updatedData = await updatedResponse.json();
-    
-    return updatedData.comments.map(comment => ({
-      id: comment.id,
-      name: comment.author.name,
-      text: comment.text,
-      likes: comment.likes,
-      isLiked: comment.isLiked,
-      date: new Date(comment.date).getTime()
-    }));
+    return await getComments();
   } catch (error) {
     console.error("API Error:", error);
     throw error;
   }
+};
+
+export const updateComment = async (commentId, updates) => {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return { id: commentId, ...updates };
 };

@@ -1,6 +1,6 @@
 import { renderComments } from './renderComments.js';
 import { initHandlers } from './eventHandlers.js';
-import { getComments, postComment } from './api.js';
+import { getComments, postComment, updateComment } from './api.js';
 
 function disablePageScroll() {
   document.body.classList.add('-noscroll');
@@ -82,6 +82,53 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     },
     
-    onRetry: loadComments
+    onToggleLike: async (commentId) => {
+      const comment = comments.find(c => c.id === commentId);
+      if (!comment) return;
+      
+      const tempComment = {
+        ...comment,
+        isLikeLoading: true
+      };
+      
+      comments = comments.map(c => c.id === commentId ? tempComment : c);
+      renderComments(comments, isLoading, error);
+      
+      try {
+        const updatedComment = {
+          ...comment,
+          isLiked: !comment.isLiked,
+          likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
+        };
+        
+        await updateComment(commentId, {
+          isLiked: updatedComment.isLiked,
+          likes: updatedComment.likes
+        });
+        
+        comments = comments.map(c => c.id === commentId 
+          ? { ...updatedComment, isLikeLoading: false } 
+          : c
+        );
+        error = null;
+      } catch (err) {
+        console.error('Ошибка при обновлении лайка:', err);
+        error = err;
+        comments = comments.map(c => c.id === commentId 
+          ? { ...comment, isLikeLoading: false } 
+          : c
+        );
+      } finally {
+        renderComments(comments, isLoading, error);
+      }
+    },
+    
+    onRetry: loadComments,
+    
+    onReply: (author, text) => {
+      const commentInput = document.querySelector('.add-form-text');
+      commentInput.value = `> ${author}: ${text}\n\n`;
+      commentInput.focus();
+    }
   });
 });

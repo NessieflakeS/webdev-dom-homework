@@ -52,6 +52,14 @@ function renderComments(comments, isLoading = false, error = null) {
       <div class="comment-body">${safeText}</div>
       <div class="comment-footer">
         <button class="comment-reply">Ответить</button>
+        <div class="likes">
+          <span class="likes-counter">${comment.likes || 0}</span>
+          <button class="like-button 
+            ${comment.isLiked ? '-active-like' : ''}
+            ${comment.isLikeLoading ? '-loading-like' : ''}">
+            ♥
+          </button>
+        </div>
       </div>
     `;
 
