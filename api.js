@@ -1,4 +1,4 @@
-const PERSONAL_KEY = 'nikandrov-danil'; 
+const PERSONAL_KEY = 'nikandrov-danil'; // Ваш персональный ключ
 
 const BASE_URL = `https://wedev-api.sky.pro/api/v1/${PERSONAL_KEY}`;
 
@@ -28,13 +28,14 @@ export const getComments = async () => {
 
 export const postComment = async (comment) => {
   try {
-    const formData = new FormData();
-    formData.append('text', comment.text);
-    formData.append('name', comment.name);
+    const body = JSON.stringify({
+      text: comment.text,
+      name: comment.name
+    });
 
     const response = await fetch(`${BASE_URL}/comments`, {
       method: 'POST',
-      body: formData
+      body: body
     });
 
     if (!response.ok) {
