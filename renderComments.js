@@ -44,30 +44,16 @@ function renderComments(comments, isLoading = false, error = null) {
     const safeText = escapeHTML(comment.text);
     const date = formatDate(comment.date);
 
-    let replySection = '';
-    if (comment.replyTo) {
-      const safeReplyAuthor = escapeHTML(comment.replyTo.author || '');
-      const safeReplyText = escapeHTML(comment.replyTo.text || '');
-      replySection = `
-        <div class="reply-text">
-          → Ответ на ${safeReplyAuthor}: ${safeReplyText}
-        </div>
-      `;
-    }
-
     commentElement.innerHTML = `
-    <div class="comment-header">
-    <div class="comment-author">${safeName}</div>
-    <div class="comment-date">${date}</div>
-    </div>
-    ${replySection}
-    <div class="comment-body">${safeText}</div>
-    <div class="comment-footer">
-    <button class="comment-reply">Ответить</button>
-    </div>
-    ${comment.isSending ? '<div class="sending-indicator">Отправка...</div>' : ''}
+      <div class="comment-header">
+        <div class="comment-author">${safeName}</div>
+        <div class="comment-date">${date}</div>
+      </div>
+      <div class="comment-body">${safeText}</div>
+      <div class="comment-footer">
+        <button class="comment-reply">Ответить</button>
+      </div>
     `;
-
 
     commentsList.appendChild(commentElement);
   });

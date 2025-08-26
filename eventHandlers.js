@@ -1,6 +1,6 @@
 import { escapeHTML } from './escapeHTML.js';
 
-export function initHandlers({ onAddComment, onToggleLike, onReply }) {
+export function initHandlers({ onAddComment, onRetry }) {
   const nameInput = document.querySelector('.add-form-name');
   const commentInput = document.querySelector('.add-form-text');
   const addButton = document.querySelector('.add-form-button');
@@ -11,27 +11,8 @@ export function initHandlers({ onAddComment, onToggleLike, onReply }) {
   };
 
   commentsList.addEventListener('click', (event) => {
-    const commentElement = event.target.closest('.comment');
-    if (!commentElement) return;
-
-    const commentId = commentElement.dataset.id;
-
-    if (event.target.classList.contains('like-button')) {
-      event.preventDefault();
-      onToggleLike(commentId);
-      return;
-    }
-
-    if (event.target.classList.contains('comment-reply')) {
-      event.preventDefault();
-      const author = commentElement.querySelector('.comment-author').textContent;
-      const text = commentElement.querySelector('.comment-body').textContent;
-      onReply(author, text);
-      return;
-    }
-
     if (event.target.classList.contains('retry-btn')) {
-      window.location.reload();
+      onRetry();
     }
   });
 
@@ -48,8 +29,6 @@ export function initHandlers({ onAddComment, onToggleLike, onReply }) {
       text: escapeHTML(text)
     });
     
-    nameInput.value = '';
-    commentInput.value = '';
     addButton.disabled = true;
   });
 

@@ -1,12 +1,6 @@
 import { renderComments } from './renderComments.js';
 import { initHandlers } from './eventHandlers.js';
-import { getComments, postComment, updateComment } from './api.js';
-
-function delay(interval = 300) {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(), interval);
-  });
-}
+import { getComments, postComment } from './api.js';
 
 function disablePageScroll() {
   document.body.classList.add('-noscroll');
@@ -56,14 +50,6 @@ function setFormDisabled(disabled) {
     if (disabled) {
       addForm.classList.add('-loading');
       disablePageScroll();
-      
-      setTimeout(() => {
-        addForm.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center',
-          inline: 'center'
-        });
-      }, 100);
     } else {
       addForm.classList.remove('-loading');
       enablePageScroll();
@@ -79,11 +65,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       setFormDisabled(true);
       
       try {
-        await postComment(newComment);
-        
-        comments = await getComments();
+        comments = await postComment(newComment);
         error = null;
         
+        const nameInput = document.querySelector('.add-form-name');
+        const commentInput = document.querySelector('.add-form-text');
         nameInput.value = '';
         commentInput.value = '';
         
@@ -96,12 +82,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     },
     
-    onToggleLike: null,
-    
-    onReply: (author, text) => {
-      const commentInput = document.querySelector('.add-form-text');
-      commentInput.value = `> ${author}: ${text}\n\n`;
-      commentInput.focus();
-    }
+    onRetry: loadComments
   });
 });
