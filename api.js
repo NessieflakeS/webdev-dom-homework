@@ -1,81 +1,54 @@
+const PERSONAL_KEY = 'nikandrov-danil'; 
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBVkXaQ3Gd2e9xWzIeHlWoqPDsw39v_Y08",
-  authDomain: "commentsapp-d753f.firebaseapp.com",
-  databaseURL: "https://commentsapp-d753f-default-rtdb.firebaseio.com",
-  projectId: "commentsapp-d753f",
-  storageBucket: "commentsapp-d753f.firebasestorage.app",
-  messagingSenderId: "399259652856",
-  appId: "1:399259652856:web:c17203606e1312b097610d"
-};
-
-
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
+const BASE_URL = `https://wedev-api.sky.pro/api/v1/${PERSONAL_KEY}/comments`;
 
 export const getComments = async () => {
   try {
-    const snapshot = await database.ref('comments').once('value');
-    const comments = snapshot.val() || {};
+    const response = await fetch(BASE_URL);
     
-    return Object.keys(comments).map(key => {
-      const comment = comments[key];
-      
-      let dateValue = comment.date;
-      if (typeof dateValue === 'string') {
-        try {
-          dateValue = new Date(dateValue).getTime();
-        } catch (e) {
-          dateValue = Date.now();
-        }
-      }
-      
-      return {
-        id: key,
-        name: comment.name || 'Аноним',
-        text: comment.text || '',
-        likes: comment.likes || 0,
-        isLiked: comment.isLiked || false,
-        replyTo: comment.replyTo || null,
-        date: dateValue || Date.now()
-      };
-    });
+    if (!response.ok) {
+      throw new Error('Ошибка сервера');
+    }
+
+    const data = await response.json();
+    
+    return data.comments.map(comment => ({
+      id: comment.id,
+      name: comment.author.name,
+      text: comment.text,
+      likes: comment.likes,
+      isLiked: comment.isLiked,
+      date: new Date(comment.date).getTime()
+    }));
   } catch (error) {
-    console.error("Firebase Error:", error);
-    return [];
+    console.error("API Error:", error);
+    throw error;
   }
 };
 
 export const postComment = async (comment) => {
   try {
-    const newCommentRef = database.ref('comments').push();
-    const timestamp = Date.now();
-    
-    await newCommentRef.set({
-      ...comment,
-      date: timestamp, 
-      likes: 0,
-      isLiked: false,
-      replyTo: comment.replyTo || null
+    const response = await fetch(BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: comment.text,
+        name: comment.name
+      })
     });
-    
-    return {
-      id: newCommentRef.key,
-      ...comment,
-      date: timestamp 
-    };
-  } catch (error) {
-    console.error("Firebase Error:", error);
-    throw error;
-  }
-};
 
-export const updateComment = async (id, updates) => {
-  try {
-    await database.ref(`comments/${id}`).update(updates);
-    return { id, ...updates };
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Ошибка сервера');
+    }
+
+    const updatedComments = await getComments();
+    return updatedComments;
   } catch (error) {
-    console.error("Firebase Error:", error);
+    console.error("API Error:", error);
     throw error;
   }
 };

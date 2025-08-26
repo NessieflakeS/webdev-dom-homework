@@ -56,25 +56,18 @@ function renderComments(comments, isLoading = false, error = null) {
     }
 
     commentElement.innerHTML = `
-      <div class="comment-header">
-        <div class="comment-author">${safeName}</div>
-        <div class="comment-date">${date}</div>
-      </div>
-      ${replySection}
-      <div class="comment-body">${safeText}</div>
-      <div class="comment-footer">
-        <button class="comment-reply">Ответить</button>
-        <div class="likes">
-          <span class="likes-counter">${comment.likes || 0}</span>
-          <button class="like-button 
-            ${comment.isLiked ? '-active-like' : ''}
-            ${comment.isLikeLoading ? '-loading-like' : ''}">
-            ♥
-          </button>
-        </div>
-      </div>
-      ${comment.isSending ? '<div class="sending-indicator">Отправка...</div>' : ''}
+    <div class="comment-header">
+    <div class="comment-author">${safeName}</div>
+    <div class="comment-date">${date}</div>
+    </div>
+    ${replySection}
+    <div class="comment-body">${safeText}</div>
+    <div class="comment-footer">
+    <button class="comment-reply">Ответить</button>
+    </div>
+    ${comment.isSending ? '<div class="sending-indicator">Отправка...</div>' : ''}
     `;
+
 
     commentsList.appendChild(commentElement);
   });
