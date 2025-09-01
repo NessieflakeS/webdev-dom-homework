@@ -1,10 +1,14 @@
-const PERSONAL_KEY = 'nikandrov-danil'; // Ваш персональный ключ
+const PERSONAL_KEY = 'nikandrov-danil';
 
-const BASE_URL = `https://wedev-api.sky.pro/api/v1/${PERSONAL_KEY}`;
+const BASE_URL = `https://wedev-api.sky.pro/api/v2/${PERSONAL_KEY}/comments`;
 
 export const getComments = async () => {
   try {
-    const response = await fetch(`${BASE_URL}/comments`);
+    const response = await fetch(BASE_URL);
+    
+    if (response.status === 500) {
+      throw new Error('Сервер сломался, попробуй позже');
+    }
     
     if (!response.ok) {
       throw new Error('Ошибка сервера');
@@ -21,31 +25,47 @@ export const getComments = async () => {
       date: new Date(comment.date).getTime()
     }));
   } catch (error) {
-    console.error("API Error:", error);
+    if (error.message === 'Failed to fetch') {
+      throw new Error('Кажется, у вас сломался интернет, попробуйте позже');
+    }
     throw error;
   }
 };
 
-export const postComment = async (comment) => {
+export const postComment = async ({ name, text, forceError = false }, retries = 3) => {
   try {
     const body = JSON.stringify({
-      text: comment.text,
-      name: comment.name
+      text,
+      name,
+      forceError
     });
 
-    const response = await fetch(`${BASE_URL}/comments`, {
+    const response = await fetch(BASE_URL, {
       method: 'POST',
       body: body
     });
 
+    if (response.status === 400) {
+      const errorData = await response.json();
+      throw new Error(errorData.error);
+    }
+
+    if (response.status === 500) {
+      if (retries > 0) {
+        return postComment({ name, text, forceError }, retries - 1);
+      }
+      throw new Error('Сервер сломался, попробуй позже');
+    }
+
     if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(errorData || 'Ошибка сервера');
+      throw new Error('Ошибка сервера');
     }
 
     return await getComments();
   } catch (error) {
-    console.error("API Error:", error);
+    if (error.message === 'Failed to fetch') {
+      throw new Error('Кажется, у вас сломался интернет, попробуйте позже');
+    }
     throw error;
   }
 };

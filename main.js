@@ -32,6 +32,7 @@ const loadComments = async () => {
     console.error('Failed to load comments:', err);
     error = err;
     comments = [];
+    alert(err.message);
   } finally {
     isLoading = false;
     renderComments(comments, isLoading, error);
@@ -82,10 +83,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           isSending: true
         };
         
-        comments = [...comments, tempComment]; // Добавляем в конец
+        comments = [...comments, tempComment]; 
         renderComments(comments, isLoading, error);
         
-        const updatedComments = await postComment(newComment);
+        const updatedComments = await postComment({
+          ...newComment,
+          forceError: false // меняем на true для теста 500 ошибки из дз
+        });
         
         const elapsed = Date.now() - startTime;
         const remainingDelay = Math.max(2000 - elapsed, 0);
@@ -103,6 +107,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Failed to post comment:', err);
         error = err;
         comments = comments.filter(c => !c.isSending);
+        
+        alert(err.message);
       } finally {
         setFormDisabled(false);
         renderComments(comments, isLoading, error);
