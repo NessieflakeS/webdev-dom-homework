@@ -1,6 +1,6 @@
 const PERSONAL_KEY = 'nikandrov-danil';
 
-const BASE_URL = `https://wedev-api.sky.pro/api/v2/${PERSONAL_KEY}/comments`;
+const BASE_URL = `https://wedev-api.sky.pro/api/v1/${PERSONAL_KEY}/comments`;
 
 export const getComments = async () => {
   try {
