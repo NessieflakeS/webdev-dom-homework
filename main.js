@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const updatedComments = await postComment({
           ...newComment,
-          forceError: false // меняем на true для теста 500 ошибки из дз
+          forceError: true // меняем на true для теста 500 ошибки из дз
         });
         
         const elapsed = Date.now() - startTime;
