@@ -11,7 +11,7 @@ const formatDate = (timestamp) => {
   });
 };
 
-function renderComments(comments, isLoading = false, error = null) {
+function renderComments(comments, isLoading = false, error = null, formData = { name: '', text: '' }) {
   const commentsList = document.querySelector('.comments');
   commentsList.innerHTML = '';
 

@@ -1,17 +1,17 @@
 const PERSONAL_KEY = 'nikandrov-danil';
 
-const BASE_URL = `https://wedev-api.sky.pro/api/v1/${PERSONAL_KEY}/comments`;
+const BASE_URL = `https://wedev-api.sky.pro/api/v1/${PERSONAL_KEY}`;
 
 export const getComments = async () => {
   try {
-    const response = await fetch(BASE_URL);
-    
-    if (response.status === 500) {
-      throw new Error('Сервер сломался, попробуй позже');
-    }
+    const response = await fetch(`${BASE_URL}/comments`);
     
     if (!response.ok) {
-      throw new Error('Ошибка сервера');
+      if (response.status === 500) {
+        throw new Error('Сервер сломался, попробуй позже');
+      } else {
+        throw new Error('Ошибка сервера');
+      }
     }
 
     const data = await response.json();
@@ -32,33 +32,28 @@ export const getComments = async () => {
   }
 };
 
-export const postComment = async ({ name, text, forceError = false }, retries = 3) => {
+export const postComment = async (comment, retryCount = 0) => {
   try {
     const body = JSON.stringify({
-      text,
-      name,
-      forceError
+      text: comment.text,
+      name: comment.name,
+      forceError: true 
     });
 
-    const response = await fetch(BASE_URL, {
+    const response = await fetch(`${BASE_URL}/comments`, {
       method: 'POST',
       body: body
     });
 
-    if (response.status === 400) {
-      const errorData = await response.json();
-      throw new Error(errorData.error);
-    }
-
-    if (response.status === 500) {
-      if (retries > 0) {
-        return postComment({ name, text, forceError }, retries - 1);
-      }
-      throw new Error('Сервер сломался, попробуй позже');
-    }
-
     if (!response.ok) {
-      throw new Error('Ошибка сервера');
+      if (response.status === 400) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Имя и комментарий должны быть не короче 3 символов');
+      } else if (response.status === 500) {
+        throw new Error('Сервер сломался, попробуй позже');
+      } else {
+        throw new Error('Ошибка сервера');
+      }
     }
 
     return await getComments();
@@ -66,6 +61,13 @@ export const postComment = async ({ name, text, forceError = false }, retries = 
     if (error.message === 'Failed to fetch') {
       throw new Error('Кажется, у вас сломался интернет, попробуйте позже');
     }
+    
+    if (error.message === 'Сервер сломался, попробуй позже' && retryCount < 2) {
+      console.log(`Повторная попытка ${retryCount + 1}/2`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return postComment(comment, retryCount + 1);
+    }
+    
     throw error;
   }
 };

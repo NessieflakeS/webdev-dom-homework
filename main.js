@@ -20,10 +20,11 @@ function enablePageScroll() {
 let comments = [];
 let isLoading = false;
 let error = null;
+let formData = { name: '', text: '' }; 
 
 const loadComments = async () => {
   isLoading = true;
-  renderComments(comments, isLoading, error);
+  renderComments(comments, isLoading, error, formData);
   
   try {
     comments = await getComments();
@@ -31,11 +32,15 @@ const loadComments = async () => {
   } catch (err) {
     console.error('Failed to load comments:', err);
     error = err;
-    comments = [];
-    alert(err.message);
+    
+    if (err.message === 'Сервер сломался, попробуй позже') {
+      alert('Сервер сломался, попробуй позже');
+    } else if (err.message === 'Кажется, у вас сломался интернет, попробуйте позже') {
+      alert('Кажется, у вас сломался интернет, попробуйте позже');
+    }
   } finally {
     isLoading = false;
-    renderComments(comments, isLoading, error);
+    renderComments(comments, isLoading, error, formData);
   }
 };
 
@@ -64,13 +69,32 @@ function setFormDisabled(disabled) {
   }
 }
 
+function saveFormData() {
+  const nameInput = document.querySelector('.add-form-name');
+  const commentInput = document.querySelector('.add-form-text');
+  
+  if (nameInput) formData.name = nameInput.value;
+  if (commentInput) formData.text = commentInput.value;
+}
+
+function restoreFormData() {
+  const nameInput = document.querySelector('.add-form-name');
+  const commentInput = document.querySelector('.add-form-text');
+  
+  if (nameInput) nameInput.value = formData.name;
+  if (commentInput) commentInput.value = formData.text;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+  restoreFormData();
+  
   await loadComments();
 
   initHandlers({
     onAddComment: async (newComment) => {
       const startTime = Date.now();
       setFormDisabled(true);
+      saveFormData(); // Сохраняем данные формы
       
       try {
         const tempComment = {
@@ -83,13 +107,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           isSending: true
         };
         
-        comments = [...comments, tempComment]; 
-        renderComments(comments, isLoading, error);
+        comments = [...comments, tempComment];
+        renderComments(comments, isLoading, error, formData);
         
-        const updatedComments = await postComment({
-          ...newComment,
-          forceError: true // меняем на true для теста 500 ошибки из дз
-        });
+        const updatedComments = await postComment(newComment);
         
         const elapsed = Date.now() - startTime;
         const remainingDelay = Math.max(2000 - elapsed, 0);
@@ -97,21 +118,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         comments = updatedComments;
         error = null;
-        
-        const nameInput = document.querySelector('.add-form-name');
-        const commentInput = document.querySelector('.add-form-text');
-        nameInput.value = '';
-        commentInput.value = '';
+        formData = { name: '', text: '' }; // Очищаем данные формы
         
       } catch (err) {
         console.error('Failed to post comment:', err);
         error = err;
-        comments = comments.filter(c => !c.isSending);
         
-        alert(err.message);
+        if (err.message.includes('не короче 3 символов')) {
+          alert('Имя и комментарий должны быть не короче 3 символов');
+        } else if (err.message === 'Сервер сломался, попробуй позже') {
+          alert('Сервер сломался, попробуй позже');
+        } else if (err.message === 'Кажется, у вас сломался интернет, попробуйте позже') {
+          alert('Кажется, у вас сломался интернет, попробуйте позже');
+        }
+        
+        comments = comments.filter(c => !c.isSending);
       } finally {
         setFormDisabled(false);
-        renderComments(comments, isLoading, error);
+        restoreFormData(); 
+        renderComments(comments, isLoading, error, formData);
       }
     },
     
@@ -128,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       };
       
       comments = updatedComments;
-      renderComments(comments, isLoading, error);
+      renderComments(comments, isLoading, error, formData);
       
       try {
         await delay(1000);
@@ -146,6 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch (err) {
         console.error('Ошибка при обновлении лайка:', err);
         error = err;
+        
         const restoredComments = [...comments];
         restoredComments[commentIndex] = {
           ...comment,
@@ -153,7 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         comments = restoredComments;
       } finally {
-        renderComments(comments, isLoading, error);
+        renderComments(comments, isLoading, error, formData);
       }
     },
     
@@ -161,8 +187,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     onReply: (author, text) => {
       const commentInput = document.querySelector('.add-form-text');
-      commentInput.value = `> ${author}: ${text}\n\n`;
+      formData.text = `> ${author}: ${text}\n\n${formData.text}`;
+      restoreFormData();
       commentInput.focus();
+    },
+    
+    onInputChange: () => {
+      saveFormData();
     }
   });
 });
