@@ -33,9 +33,9 @@ const loadComments = async () => {
     console.error('Failed to load comments:', err);
     error = err;
     
-    if (err.message === 'Сервер сломался, попробуй позже') {
+    if (err.code === 500) {
       alert('Сервер сломался, попробуй позже');
-    } else if (err.message === 'Кажется, у вас сломался интернет, попробуйте позже') {
+    } else if (err.code === 'NETWORK_ERROR') {
       alert('Кажется, у вас сломался интернет, попробуйте позже');
     }
   } finally {
@@ -121,23 +121,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         formData = { name: '', text: '' }; // Очищаем данные формы
         
       } catch (err) {
-        console.error('Failed to post comment:', err);
-        error = err;
-        
-        if (err.message.includes('не короче 3 символов')) {
-          alert('Имя и комментарий должны быть не короче 3 символов');
-        } else if (err.message === 'Сервер сломался, попробуй позже') {
-          alert('Сервер сломался, попробуй позже');
-        } else if (err.message === 'Кажется, у вас сломался интернет, попробуйте позже') {
-          alert('Кажется, у вас сломался интернет, попробуйте позже');
-        }
-        
-        comments = comments.filter(c => !c.isSending);
-      } finally {
-        setFormDisabled(false);
-        restoreFormData(); 
-        renderComments(comments, isLoading, error, formData);
+      console.error('Failed to post comment:', err);
+      error = err;
+      
+      if (err.code === 400) {
+        alert('Имя и комментарий должны быть не короче 3 символов');
+      } else if (err.code === 500) {
+        alert('Сервер сломался, попробуй позже');
+      } else if (err.code === 'NETWORK_ERROR') {
+        alert('Кажется, у вас сломался интернет, попробуйте позже');
       }
+      
+      comments = comments.filter(c => !c.isSending);
+    }
     },
     
     onToggleLike: async (commentId) => {

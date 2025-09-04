@@ -7,11 +7,13 @@ export const getComments = async () => {
     const response = await fetch(`${BASE_URL}/comments`);
     
     if (!response.ok) {
-      if (response.status === 500) {
-        throw new Error('Сервер сломался, попробуй позже');
-      } else {
-        throw new Error('Ошибка сервера');
-      }
+      const error = new Error(
+        response.status === 500 
+          ? 'Сервер сломался, попробуй позже' 
+          : 'Ошибка сервера'
+      );
+      error.code = response.status;
+      throw error;
     }
 
     const data = await response.json();
@@ -26,7 +28,9 @@ export const getComments = async () => {
     }));
   } catch (error) {
     if (error.message === 'Failed to fetch') {
-      throw new Error('Кажется, у вас сломался интернет, попробуйте позже');
+      const networkError = new Error('Кажется, у вас сломался интернет, попробуйте позже');
+      networkError.code = 'NETWORK_ERROR';
+      throw networkError;
     }
     throw error;
   }
@@ -46,23 +50,28 @@ export const postComment = async (comment, retryCount = 0) => {
     });
 
     if (!response.ok) {
+      let errorMessage = 'Ошибка сервера';
       if (response.status === 400) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Имя и комментарий должны быть не короче 3 символов');
+        errorMessage = errorData.error || 'Имя и комментарий должны быть не короче 3 символов';
       } else if (response.status === 500) {
-        throw new Error('Сервер сломался, попробуй позже');
-      } else {
-        throw new Error('Ошибка сервера');
+        errorMessage = 'Сервер сломался, попробуй позже';
       }
+      
+      const error = new Error(errorMessage);
+      error.code = response.status;
+      throw error;
     }
 
     return await getComments();
   } catch (error) {
     if (error.message === 'Failed to fetch') {
-      throw new Error('Кажется, у вас сломался интернет, попробуйте позже');
+      const networkError = new Error('Кажется, у вас сломался интернет, попробуйте позже');
+      networkError.code = 'NETWORK_ERROR';
+      throw networkError;
     }
     
-    if (error.message === 'Сервер сломался, попробуй позже' && retryCount < 2) {
+    if (error.code === 500 && retryCount < 2) {
       console.log(`Повторная попытка ${retryCount + 1}/2`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       return postComment(comment, retryCount + 1);

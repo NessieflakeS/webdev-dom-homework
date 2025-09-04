@@ -45,7 +45,7 @@ export function initHandlers({ onAddComment, onToggleLike, onReply, onRetry, onI
     const name = nameInput.value.trim();
     const text = commentInput.value.trim();
     
-    if (name.length < 3 || text.length < 3) {
+      if (name.length < 3 || text.length < 3) {
       alert('Имя и комментарий должны быть не короче 3 символов');
       return;
     }
