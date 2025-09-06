@@ -133,6 +133,7 @@ body.-noscroll {
 .add-form-name {
   width: 300px;
   padding: 11px 22px;
+  margin: 10px;
 }
 
 .add-form-text {
