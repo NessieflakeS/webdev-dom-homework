@@ -1,4 +1,5 @@
 import { escapeHTML } from './escapeHTML.js';
+import { getToken } from './api.js';
 
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
@@ -11,8 +12,9 @@ const formatDate = (timestamp) => {
   });
 };
 
-function renderComments(comments, isLoading = false, error = null, formData = { name: '', text: '' }) {
-  const commentsList = document.querySelector('.comments');
+export function renderComments(comments, isLoading = false, error = null, formData = { text: '' }, commentsList) {
+  const token = getToken();
+  
   commentsList.innerHTML = '';
 
   if (isLoading) {
@@ -68,6 +70,12 @@ function renderComments(comments, isLoading = false, error = null, formData = { 
 
     commentsList.appendChild(commentElement);
   });
-}
 
-export { renderComments };
+  if (!token) {
+    commentsList.insertAdjacentHTML('afterend', `
+      <div class="auth-prompt">
+        Чтобы добавить комментарий, <a href="#" id="auth-link">авторизуйтесь</a>
+      </div>
+    `);
+  }
+}

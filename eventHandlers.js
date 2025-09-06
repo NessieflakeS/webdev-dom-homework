@@ -1,13 +1,16 @@
 import { escapeHTML } from './escapeHTML.js';
+import { getToken } from './api.js';
 
 export function initHandlers({ onAddComment, onToggleLike, onReply, onRetry, onInputChange }) {
-  const nameInput = document.querySelector('.add-form-name');
   const commentInput = document.querySelector('.add-form-text');
   const addButton = document.querySelector('.add-form-button');
   const commentsList = document.querySelector('.comments');
+  const appEl = document.getElementById('app');
 
   const checkInputs = () => {
-    addButton.disabled = !(nameInput.value.trim() && commentInput.value.trim());
+    if (addButton) {
+      addButton.disabled = !commentInput.value.trim();
+    }
     if (onInputChange) onInputChange();
   };
 
@@ -39,25 +42,33 @@ export function initHandlers({ onAddComment, onToggleLike, onReply, onRetry, onI
     }
   });
 
-  addButton.addEventListener('click', (event) => {
-    event.preventDefault();
-    
-    const name = nameInput.value.trim();
-    const text = commentInput.value.trim();
-    
-      if (name.length < 3 || text.length < 3) {
-      alert('Имя и комментарий должны быть не короче 3 символов');
-      return;
-    }
-    
-    onAddComment({
-      name: escapeHTML(name),
-      text: escapeHTML(text)
+  if (addButton && commentInput) {
+    addButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      
+      const text = commentInput.value.trim();
+      
+      if (text.length < 3) {
+        alert('Комментарий должен быть не короче 3 символов');
+        return;
+      }
+      
+      onAddComment({
+        text: escapeHTML(text)
+      });
     });
-  });
 
-  nameInput.addEventListener('input', checkInputs);
-  commentInput.addEventListener('input', checkInputs);
+    commentInput.addEventListener('input', checkInputs);
+  }
+
+  const authLink = document.getElementById('auth-link');
+  if (authLink) {
+    authLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      const event = new CustomEvent('renderLogin');
+      appEl.dispatchEvent(event);
+    });
+  }
   
   checkInputs();
 }
