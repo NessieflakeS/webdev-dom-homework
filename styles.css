@@ -389,3 +389,18 @@ body.-noscroll {
 .logout-button:hover {
   background: rgba(188, 236, 48, 0.1);
 }
+
+.add-form-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.add-form-name:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+#toggle-link[style*="pointer-events: none"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

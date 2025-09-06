@@ -121,10 +121,11 @@ export const login = async ({ login, password }) => {
     });
 
     if (!response.ok) {
+      const errorData = await response.json();
       if (response.status === 400) {
-        throw new Error('Неверный логин или пароль');
+        throw new Error(errorData.error || 'Неверный логин или пароль');
       } else {
-        throw new Error('Ошибка сервера');
+        throw new Error(errorData.error || 'Ошибка сервера');
       }
     }
 
@@ -155,10 +156,11 @@ export const register = async ({ name, login, password }) => {
     });
 
     if (!response.ok) {
+      const errorData = await response.json();
       if (response.status === 400) {
-        throw new Error('Пользователь с таким логином уже существует');
+        throw new Error(errorData.error || 'Пользователь с таким логином уже существует');
       } else {
-        throw new Error('Ошибка сервера');
+        throw new Error(errorData.error || 'Ошибка сервера');
       }
     }
 

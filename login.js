@@ -3,6 +3,7 @@ import { login, register } from './api.js';
 export function renderLoginComponent({ appEl, onSuccess }) {
   let isLoginMode = true;
   let errorMessage = '';
+  let isLoading = false;
 
   const renderForm = () => {
     const appHtml = `
@@ -19,6 +20,7 @@ export function renderLoginComponent({ appEl, onSuccess }) {
               placeholder="Введите имя"
               id="name-input"
               value=""
+              ${isLoading ? 'disabled' : ''}
             />
           `}
           
@@ -28,6 +30,7 @@ export function renderLoginComponent({ appEl, onSuccess }) {
             placeholder="Введите логин"
             id="login-input"
             value=""
+            ${isLoading ? 'disabled' : ''}
           />
           
           <input
@@ -36,16 +39,17 @@ export function renderLoginComponent({ appEl, onSuccess }) {
             placeholder="Введите пароль"
             id="password-input"
             value=""
+            ${isLoading ? 'disabled' : ''}
           />
           
           <div class="add-form-row">
-            <button class="add-form-button" id="login-button">
-              ${isLoginMode ? 'Войти' : 'Зарегистрироваться'}
+            <button class="add-form-button" id="login-button" ${isLoading ? 'disabled' : ''}>
+              ${isLoading ? 'Загрузка...' : (isLoginMode ? 'Войти' : 'Зарегистрироваться')}
             </button>
           </div>
           
           <div class="add-form-row" style="justify-content: center; margin-top: 20px;">
-            <a href="#" id="toggle-link" style="color: #bcec30;">
+            <a href="#" id="toggle-link" style="color: #bcec30;" ${isLoading ? 'style="pointer-events: none;"' : ''}>
               ${isLoginMode ? 'Зарегистрироваться' : 'Войти'}
             </a>
           </div>
@@ -56,6 +60,8 @@ export function renderLoginComponent({ appEl, onSuccess }) {
     appEl.innerHTML = appHtml;
 
     document.getElementById('login-button').addEventListener('click', () => {
+      if (isLoading) return;
+      
       if (isLoginMode) {
         const loginValue = document.getElementById('login-input').value;
         const password = document.getElementById('password-input').value;
@@ -66,12 +72,16 @@ export function renderLoginComponent({ appEl, onSuccess }) {
           return;
         }
 
+        isLoading = true;
+        renderForm();
+
         login({ login: loginValue, password })
           .then(() => {
             onSuccess();
           })
           .catch((error) => {
             errorMessage = error.message;
+            isLoading = false;
             renderForm();
           });
       } else {
@@ -85,12 +95,16 @@ export function renderLoginComponent({ appEl, onSuccess }) {
           return;
         }
 
+        isLoading = true;
+        renderForm();
+
         register({ name, login: loginValue, password })
           .then(() => {
             onSuccess();
           })
           .catch((error) => {
             errorMessage = error.message;
+            isLoading = false;
             renderForm();
           });
       }
@@ -98,6 +112,8 @@ export function renderLoginComponent({ appEl, onSuccess }) {
 
     document.getElementById('toggle-link').addEventListener('click', (event) => {
       event.preventDefault();
+      if (isLoading) return;
+      
       isLoginMode = !isLoginMode;
       errorMessage = '';
       renderForm();
