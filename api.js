@@ -1,5 +1,5 @@
 const PERSONAL_KEY = 'nikandrov-danil';
-const BASE_URL = `https://wedev-api.sky.pro/api/v1/${PERSONAL_KEY}`;
+const BASE_URL = `https://wedev-api.sky.pro/api/v2/${PERSONAL_KEY}`;
 
 export let token = null;
 export let user = null;
