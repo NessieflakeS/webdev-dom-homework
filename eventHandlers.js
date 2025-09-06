@@ -1,6 +1,6 @@
 import { escapeHTML } from './escapeHTML.js';
 
-export function initHandlers({ onAddComment, onToggleLike, onReply, onRetry }) {
+export function initHandlers({ onAddComment, onToggleLike, onReply, onRetry, onInputChange }) {
   const nameInput = document.querySelector('.add-form-name');
   const commentInput = document.querySelector('.add-form-text');
   const addButton = document.querySelector('.add-form-button');
@@ -8,6 +8,7 @@ export function initHandlers({ onAddComment, onToggleLike, onReply, onRetry }) {
 
   const checkInputs = () => {
     addButton.disabled = !(nameInput.value.trim() && commentInput.value.trim());
+    if (onInputChange) onInputChange();
   };
 
   commentsList.addEventListener('click', (event) => {
@@ -44,14 +45,15 @@ export function initHandlers({ onAddComment, onToggleLike, onReply, onRetry }) {
     const name = nameInput.value.trim();
     const text = commentInput.value.trim();
     
-    if (!name || !text) return;
+      if (name.length < 3 || text.length < 3) {
+      alert('Имя и комментарий должны быть не короче 3 символов');
+      return;
+    }
     
     onAddComment({
       name: escapeHTML(name),
       text: escapeHTML(text)
     });
-    
-    addButton.disabled = true;
   });
 
   nameInput.addEventListener('input', checkInputs);

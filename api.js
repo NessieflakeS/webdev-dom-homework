@@ -1,4 +1,4 @@
-const PERSONAL_KEY = 'nikandrov-danil'; // Ваш персональный ключ
+const PERSONAL_KEY = 'nikandrov-danil';
 
 const BASE_URL = `https://wedev-api.sky.pro/api/v1/${PERSONAL_KEY}`;
 
@@ -7,7 +7,13 @@ export const getComments = async () => {
     const response = await fetch(`${BASE_URL}/comments`);
     
     if (!response.ok) {
-      throw new Error('Ошибка сервера');
+      const error = new Error(
+        response.status === 500 
+          ? 'Сервер сломался, попробуй позже' 
+          : 'Ошибка сервера'
+      );
+      error.code = response.status;
+      throw error;
     }
 
     const data = await response.json();
@@ -21,16 +27,21 @@ export const getComments = async () => {
       date: new Date(comment.date).getTime()
     }));
   } catch (error) {
-    console.error("API Error:", error);
+    if (error.message === 'Failed to fetch') {
+      const networkError = new Error('Кажется, у вас сломался интернет, попробуйте позже');
+      networkError.code = 'NETWORK_ERROR';
+      throw networkError;
+    }
     throw error;
   }
 };
 
-export const postComment = async (comment) => {
+export const postComment = async (comment, retryCount = 0) => {
   try {
     const body = JSON.stringify({
       text: comment.text,
-      name: comment.name
+      name: comment.name,
+      forceError: true 
     });
 
     const response = await fetch(`${BASE_URL}/comments`, {
@@ -39,13 +50,33 @@ export const postComment = async (comment) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(errorData || 'Ошибка сервера');
+      let errorMessage = 'Ошибка сервера';
+      if (response.status === 400) {
+        const errorData = await response.json();
+        errorMessage = errorData.error || 'Имя и комментарий должны быть не короче 3 символов';
+      } else if (response.status === 500) {
+        errorMessage = 'Сервер сломался, попробуй позже';
+      }
+      
+      const error = new Error(errorMessage);
+      error.code = response.status;
+      throw error;
     }
 
     return await getComments();
   } catch (error) {
-    console.error("API Error:", error);
+    if (error.message === 'Failed to fetch') {
+      const networkError = new Error('Кажется, у вас сломался интернет, попробуйте позже');
+      networkError.code = 'NETWORK_ERROR';
+      throw networkError;
+    }
+    
+    if (error.code === 500 && retryCount < 2) {
+      console.log(`Повторная попытка ${retryCount + 1}/2`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return postComment(comment, retryCount + 1);
+    }
+    
     throw error;
   }
 };
