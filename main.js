@@ -127,10 +127,12 @@ function renderApp() {
   renderComments(comments, isLoading, error, formData, commentsList);
 
   const logoutButton = document.querySelector('.logout-button');
-  logoutButton.addEventListener('click', () => {
-    removeAuthData();
-    renderApp();
-  });
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      removeAuthData();
+      renderApp();
+    });
+  }
 
   initHandlers({
     onAddComment: async (newComment) => {
@@ -200,7 +202,7 @@ function renderApp() {
       };
       
       comments = updatedComments;
-      renderComments(comments, isLoading, error, formData);
+      renderApp();
       
       try {
         await delay(1000);
@@ -226,7 +228,7 @@ function renderApp() {
         };
         comments = restoredComments;
       } finally {
-        renderComments(comments, isLoading, error, formData);
+        renderApp();
       }
     },
     
@@ -236,7 +238,7 @@ function renderApp() {
       const commentInput = document.querySelector('.add-form-text');
       formData.text = `> ${author}: ${text}\n\n${formData.text}`;
       restoreFormData();
-      commentInput.focus();
+      if (commentInput) commentInput.focus();
     },
     
     onInputChange: () => {
@@ -246,6 +248,10 @@ function renderApp() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const appEl = document.createElement('div');
+  appEl.id = 'app';
+  document.body.appendChild(appEl);
+  
   renderApp();
   loadComments();
 });

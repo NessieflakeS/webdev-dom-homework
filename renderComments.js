@@ -15,6 +15,11 @@ const formatDate = (timestamp) => {
 export function renderComments(comments, isLoading = false, error = null, formData = { text: '' }, commentsList) {
   const token = getToken();
   
+  if (!commentsList) {
+    commentsList = document.querySelector('.comments');
+    if (!commentsList) return;
+  }
+  
   commentsList.innerHTML = '';
 
   if (isLoading) {
@@ -72,10 +77,13 @@ export function renderComments(comments, isLoading = false, error = null, formDa
   });
 
   if (!token) {
-    commentsList.insertAdjacentHTML('afterend', `
-      <div class="auth-prompt">
-        Чтобы добавить комментарий, <a href="#" id="auth-link">авторизуйтесь</a>
-      </div>
-    `);
+    const container = document.querySelector('.container');
+    if (container && !document.querySelector('.auth-prompt')) {
+      container.insertAdjacentHTML('beforeend', `
+        <div class="auth-prompt">
+          Чтобы добавить комментарий, <a href="#" id="auth-link">авторизуйтесь</a>
+        </div>
+      `);
+    }
   }
 }
