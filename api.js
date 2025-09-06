@@ -85,15 +85,22 @@ export const postComment = async (text) => {
       }),
     });
 
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Сервер вернул неверный формат данных');
+    }
+
+    const data = await response.json();
+
     if (!response.ok) {
       if (response.status === 400) {
-        throw new Error('Комментарий должен быть не короче 3 символов');
+        throw new Error(data.error || 'Комментарий должен быть не короче 3 символов');
       } else if (response.status === 500) {
-        throw new Error('Сервер сломался, попробуй позже');
+        throw new Error(data.error || 'Сервер сломался, попробуй позже');
       } else if (response.status === 401) {
-        throw new Error('Ошибка авторизации');
+        throw new Error(data.error || 'Ошибка авторизации');
       } else {
-        throw new Error('Ошибка сервера');
+        throw new Error(data.error || 'Ошибка сервера');
       }
     }
 
@@ -116,16 +123,21 @@ export const login = async ({ login, password }) => {
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      if (response.status === 400) {
-        throw new Error(errorData.error || 'Неверный логин или пароль');
-      } else {
-        throw new Error(errorData.error || 'Ошибка сервера');
-      }
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Сервер вернул неверный формат данных');
     }
 
     const data = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        throw new Error(data.error || 'Неверный логин или пароль');
+      } else {
+        throw new Error(data.error || 'Ошибка сервера');
+      }
+    }
+
     setToken(data.user.token);
     setUser(data.user);
     return data;
@@ -148,16 +160,21 @@ export const register = async ({ name, login, password }) => {
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      if (response.status === 400) {
-        throw new Error(errorData.error || 'Пользователь с таким логином уже существует');
-      } else {
-        throw new Error(errorData.error || 'Ошибка сервера');
-      }
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Сервер вернул неверный формат данных');
     }
 
     const data = await response.json();
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        throw new Error(data.error || 'Пользователь с таким логином уже существует');
+      } else {
+        throw new Error(data.error || 'Ошибка сервера');
+      }
+    }
+
     setToken(data.user.token);
     setUser(data.user);
     return data;
