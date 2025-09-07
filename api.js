@@ -28,13 +28,26 @@ export const getToken = () => {
 };
 
 export const getUser = () => {
-  const userData = user || localStorage.getItem('user');
-  return userData ? JSON.parse(userData) : null;
+  try {
+    if (user) return user;
+    
+    const userData = localStorage.getItem('user');
+    
+    if (!userData) return null;
+    
+    return JSON.parse(userData);
+  } catch (error) {
+    console.error('Ошибка при получении пользователя из localStorage:', error);
+    localStorage.removeItem('user');
+    return null;
+  }
 };
 
 export const removeAuthData = () => {
-  setToken(null);
-  setUser(null);
+  token = null;
+  user = null;
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
 };
 
 export const getComments = async () => {
