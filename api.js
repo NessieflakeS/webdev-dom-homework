@@ -170,7 +170,7 @@ export const register = async ({ name, login, password }) => {
 
     const response = await fetch(AUTH_URL, {
       method: 'POST',
-      body: formData, //
+      body: formData,
     });
 
     const data = await response.json();
