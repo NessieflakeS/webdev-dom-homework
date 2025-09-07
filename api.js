@@ -1,6 +1,6 @@
 const PERSONAL_KEY = 'nikandrov-danil';
 const BASE_URL = `https://wedev-api.sky.pro/api/v2/${PERSONAL_KEY}`;
-const AUTH_URL = `https://wedev-api.sky.pro/api/user`;
+const AUTH_URL = 'https://wedev-api.sky.pro/api/user';
 
 export let token = null;
 export let user = null;
@@ -30,11 +30,10 @@ export const getToken = () => {
 export const getUser = () => {
   try {
     if (user) return user;
-    
+
     const userData = localStorage.getItem('user');
-    
     if (!userData) return null;
-    
+
     return JSON.parse(userData);
   } catch (error) {
     console.error('Ошибка при получении пользователя из localStorage:', error);
@@ -53,7 +52,7 @@ export const removeAuthData = () => {
 export const getComments = async () => {
   try {
     const response = await fetch(`${BASE_URL}/comments`);
-    
+
     if (!response.ok) {
       if (response.status === 500) {
         throw new Error('Сервер сломался, попробуй позже');
@@ -63,14 +62,14 @@ export const getComments = async () => {
     }
 
     const data = await response.json();
-    
+
     return data.comments.map(comment => ({
       id: comment.id,
       name: comment.author.name,
       text: comment.text,
       likes: comment.likes || 0,
       isLiked: comment.isLiked || false,
-      date: new Date(comment.date).getTime()
+      date: new Date(comment.date).getTime(),
     }));
   } catch (error) {
     if (error.message === 'Failed to fetch') {
@@ -83,11 +82,15 @@ export const getComments = async () => {
 export const postComment = async (text) => {
   const currentToken = getToken();
   const currentUser = getUser();
-  
-  if (!currentToken) {
+
+  if (!currentToken || !currentUser) {
     throw new Error('Ошибка авторизации');
   }
-  
+
+  if (!currentUser.name) {
+    throw new Error('У пользователя не указано имя');
+  }
+
   try {
     const response = await fetch(`${BASE_URL}/comments`, {
       method: 'POST',
@@ -96,14 +99,15 @@ export const postComment = async (text) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: currentUser.name,
-        text,
+        name: currentUser.name, 
+        text,                   
       }),
     });
 
     if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+
       if (response.status === 400) {
-        const errorData = await response.json();
         throw new Error(errorData.error || 'Комментарий должен быть не короче 3 символов');
       } else if (response.status === 500) {
         throw new Error('Сервер сломался, попробуй позже');
@@ -127,6 +131,9 @@ export const login = async ({ login, password }) => {
   try {
     const response = await fetch(`${AUTH_URL}/login`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', 
+      },
       body: JSON.stringify({
         login,
         password,
@@ -158,6 +165,9 @@ export const register = async ({ name, login, password }) => {
   try {
     const response = await fetch(AUTH_URL, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         name,
         login,
