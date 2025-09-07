@@ -1,4 +1,4 @@
-const PERSONAL_KEY = 'nikandrovDanil2025';
+const PERSONAL_KEY = 'DanilNikandrov2025';
 const BASE_URL = `https://wedev-api.sky.pro/api/v2/${PERSONAL_KEY}`;
 const AUTH_URL = 'https://wedev-api.sky.pro/api/user';
 
