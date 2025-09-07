@@ -63,19 +63,6 @@ export function initHandlers({ onAddComment, onToggleLike, onReply, onRetry, onI
 
     commentInput.addEventListener('input', checkInputs);
   }
-
-  const authLink = document.getElementById('auth-link');
-  if (authLink) {
-    authLink.addEventListener('click', (event) => {
-      event.preventDefault();
-      renderLoginComponent({
-        appEl,
-        onSuccess: () => {
-          window.location.reload();
-        }
-      });
-    });
-  }
   
   checkInputs();
 }

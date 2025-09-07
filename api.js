@@ -92,7 +92,6 @@ export const postComment = async (text) => {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${currentToken}`,
-        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         text,

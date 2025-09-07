@@ -405,3 +405,51 @@ body.-noscroll {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+
+.auth-prompt {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px;
+  color: #aaa;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.auth-prompt a {
+  color: #bcec30;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-prompt a:hover {
+  text-decoration: underline;
+}
+
+.logout-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid #bcec30;
+  color: #bcec30;
+  padding: 10px 20px;
+  border-radius: 18px;
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 16px;
+}
+
+.logout-button:hover {
+  background: rgba(188, 236, 48, 0.1);
+}
+
+.add-form h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #bcec30;
+}
+
+.like-icon {
+  color: rgba(188, 236, 48, 0.5);
+  font-size: 22px;
+  margin-left: 10px;
+}

@@ -62,28 +62,24 @@ export function renderComments(comments, isLoading = false, error = null, formDa
       </div>
       <div class="comment-body">${safeText}</div>
       <div class="comment-footer">
-        <button class="comment-reply">Ответить</button>
-        <div class="likes">
-          <span class="likes-counter">${comment.likes || 0}</span>
-          <button class="${likeButtonClass}">
-            ♥
-          </button>
-        </div>
+        ${token ? `
+          <button class="comment-reply">Ответить</button>
+          <div class="likes">
+            <span class="likes-counter">${comment.likes || 0}</span>
+            <button class="${likeButtonClass}">
+              ♥
+            </button>
+          </div>
+        ` : `
+          <div class="likes">
+            <span class="likes-counter">${comment.likes || 0}</span>
+            <span class="like-icon">♥</span>
+          </div>
+        `}
       </div>
       ${comment.isSending ? '<div class="sending-indicator">Отправка...</div>' : ''}
     `;
 
     commentsList.appendChild(commentElement);
   });
-
-  if (!token) {
-    const container = document.querySelector('.container');
-    if (container && !document.querySelector('.auth-prompt')) {
-      container.insertAdjacentHTML('beforeend', `
-        <div class="auth-prompt">
-          Чтобы добавить комментарий, <a href="#" id="auth-link">авторизуйтесь</a>
-        </div>
-      `);
-    }
-  }
 }
