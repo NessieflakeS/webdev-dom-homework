@@ -163,18 +163,11 @@ export const login = async ({ login, password }) => {
 
 export const register = async ({ name, login, password }) => {
   try {
-    const urlEncodedData = new URLSearchParams();
-    urlEncodedData.append('login', login);
-    urlEncodedData.append('password', password);
-    urlEncodedData.append('name', name);
+    const bodyString = `login=${encodeURIComponent(login)}&password=${encodeURIComponent(password)}&name=${encodeURIComponent(name)}`;
 
-   
     const response = await fetch(AUTH_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: urlEncodedData.toString(), 
+      body: bodyString, 
     });
 
     const data = await response.json();
