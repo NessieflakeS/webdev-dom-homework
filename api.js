@@ -82,6 +82,7 @@ export const getComments = async () => {
 
 export const postComment = async (text) => {
   const currentToken = getToken();
+  const currentUser = getUser();
   
   if (!currentToken) {
     throw new Error('Ошибка авторизации');
@@ -95,6 +96,7 @@ export const postComment = async (text) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        name: currentUser.name,
         text,
       }),
     });
