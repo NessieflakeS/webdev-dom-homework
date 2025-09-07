@@ -1,4 +1,4 @@
-const PERSONAL_KEY = 'danil_nikandrov_2025';
+const PERSONAL_KEY = 'danil_nikandrov';
 const BASE_URL = `https://wedev-api.sky.pro/api/v2/${PERSONAL_KEY}`;
 const AUTH_URL = 'https://wedev-api.sky.pro/api/user';
 
@@ -163,17 +163,16 @@ export const login = async ({ login, password }) => {
 
 export const register = async ({ name, login, password }) => {
   try {
-    const formData = new FormData();
-    formData.append('login', login);
-    formData.append('password', password);
-    formData.append('name', name);
-
     const response = await fetch(AUTH_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'multipart/form-data', 
+        'Content-Type': 'application/json',
       },
-      body: formData,
+      body: JSON.stringify({
+        name,
+        login,
+        password,
+      }),
     });
 
     const data = await response.json();
