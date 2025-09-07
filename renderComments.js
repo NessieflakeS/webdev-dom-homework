@@ -1,4 +1,5 @@
 import { escapeHTML } from './escapeHTML.js';
+import { getToken } from './api.js';
 
 const formatDate = (timestamp) => {
   const date = new Date(timestamp);
@@ -11,8 +12,14 @@ const formatDate = (timestamp) => {
   });
 };
 
-function renderComments(comments, isLoading = false, error = null, formData = { name: '', text: '' }) {
-  const commentsList = document.querySelector('.comments');
+export function renderComments(comments, isLoading = false, error = null, formData = { text: '' }, commentsList) {
+  const token = getToken();
+  
+  if (!commentsList) {
+    commentsList = document.querySelector('.comments');
+    if (!commentsList) return;
+  }
+  
   commentsList.innerHTML = '';
 
   if (isLoading) {
@@ -55,13 +62,20 @@ function renderComments(comments, isLoading = false, error = null, formData = { 
       </div>
       <div class="comment-body">${safeText}</div>
       <div class="comment-footer">
-        <button class="comment-reply">Ответить</button>
-        <div class="likes">
-          <span class="likes-counter">${comment.likes || 0}</span>
-          <button class="${likeButtonClass}">
-            ♥
-          </button>
-        </div>
+        ${token ? `
+          <button class="comment-reply">Ответить</button>
+          <div class="likes">
+            <span class="likes-counter">${comment.likes || 0}</span>
+            <button class="${likeButtonClass}">
+              ♥
+            </button>
+          </div>
+        ` : `
+          <div class="likes">
+            <span class="likes-counter">${comment.likes || 0}</span>
+            <span class="like-icon">♥</span>
+          </div>
+        `}
       </div>
       ${comment.isSending ? '<div class="sending-indicator">Отправка...</div>' : ''}
     `;
@@ -69,5 +83,3 @@ function renderComments(comments, isLoading = false, error = null, formData = { 
     commentsList.appendChild(commentElement);
   });
 }
-
-export { renderComments };
