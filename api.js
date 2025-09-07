@@ -163,11 +163,14 @@ export const login = async ({ login, password }) => {
 
 export const register = async ({ name, login, password }) => {
   try {
-    const bodyString = `login=${encodeURIComponent(login)}&password=${encodeURIComponent(password)}&name=${encodeURIComponent(name)}`;
+    const formData = new FormData();
+    formData.append('login', login);
+    formData.append('password', password);
+    formData.append('name', name);
 
     const response = await fetch(AUTH_URL, {
       method: 'POST',
-      body: bodyString, 
+      body: formData,
     });
 
     const data = await response.json();
