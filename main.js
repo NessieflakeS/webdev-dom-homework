@@ -88,6 +88,7 @@ function renderApp() {
       appEl,
       onSuccess: () => {
         loadComments();
+        renderApp();
       }
     });
     return;

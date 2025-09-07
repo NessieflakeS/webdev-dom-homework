@@ -79,28 +79,23 @@ export const postComment = async (text) => {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${currentToken}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         text,
       }),
     });
 
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      throw new Error('Сервер вернул неверный формат данных');
-    }
-
-    const data = await response.json();
-
     if (!response.ok) {
       if (response.status === 400) {
-        throw new Error(data.error || 'Комментарий должен быть не короче 3 символов');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Комментарий должен быть не короче 3 символов');
       } else if (response.status === 500) {
-        throw new Error(data.error || 'Сервер сломался, попробуй позже');
+        throw new Error('Сервер сломался, попробуй позже');
       } else if (response.status === 401) {
-        throw new Error(data.error || 'Ошибка авторизации');
+        throw new Error('Ошибка авторизации');
       } else {
-        throw new Error(data.error || 'Ошибка сервера');
+        throw new Error('Ошибка сервера');
       }
     }
 
@@ -117,16 +112,14 @@ export const login = async ({ login, password }) => {
   try {
     const response = await fetch(`${AUTH_URL}/login`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         login,
         password,
       }),
     });
-
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      throw new Error('Сервер вернул неверный формат данных');
-    }
 
     const data = await response.json();
 
@@ -151,19 +144,17 @@ export const login = async ({ login, password }) => {
 
 export const register = async ({ name, login, password }) => {
   try {
-    const response = await fetch(`${AUTH_URL}/register`, {
+    const response = await fetch(AUTH_URL, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         name,
         login,
         password,
       }),
     });
-
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      throw new Error('Сервер вернул неверный формат данных');
-    }
 
     const data = await response.json();
 
