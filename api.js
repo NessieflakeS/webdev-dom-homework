@@ -112,9 +112,6 @@ export const login = async ({ login, password }) => {
   try {
     const response = await fetch(`${AUTH_URL}/login`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({
         login,
         password,
@@ -146,9 +143,6 @@ export const register = async ({ name, login, password }) => {
   try {
     const response = await fetch(AUTH_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({
         name,
         login,
