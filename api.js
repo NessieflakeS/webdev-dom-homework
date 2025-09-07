@@ -1,4 +1,4 @@
-const PERSONAL_KEY = 'danil_nikandrov';
+const PERSONAL_KEY = 'danil-nikandrov';
 const BASE_URL = `https://wedev-api.sky.pro/api/v2/${PERSONAL_KEY}`;
 const AUTH_URL = 'https://wedev-api.sky.pro/api/user';
 
@@ -129,15 +129,16 @@ export const postComment = async (text) => {
 
 export const login = async ({ login, password }) => {
   try {
+    const formData = new URLSearchParams();
+    formData.append('login', login);
+    formData.append('password', password);
+
     const response = await fetch(`${AUTH_URL}/login`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json', 
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        login,
-        password,
-      }),
+      body: formData,
     });
 
     const data = await response.json();
@@ -163,16 +164,17 @@ export const login = async ({ login, password }) => {
 
 export const register = async ({ name, login, password }) => {
   try {
+    const formData = new URLSearchParams();
+    formData.append('name', name);
+    formData.append('login', login);
+    formData.append('password', password);
+
     const response = await fetch(AUTH_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
-        name,
-        login,
-        password,
-      }),
+      body: formData,
     });
 
     const data = await response.json();
