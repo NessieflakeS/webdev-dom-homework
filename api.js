@@ -168,8 +168,13 @@ export const register = async ({ name, login, password }) => {
     formData.append('password', password);
     formData.append('name', name);
 
+    const boundary = `----WebKitFormBoundary${Math.random().toString(36).substr(2)}`;
+    
     const response = await fetch(AUTH_URL, {
       method: 'POST',
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+      },
       body: formData,
     });
 
